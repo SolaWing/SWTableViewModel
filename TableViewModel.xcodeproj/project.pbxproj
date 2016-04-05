@@ -15,6 +15,10 @@
 		2133B4521CA377950032DEF7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2133B4511CA377950032DEF7 /* Assets.xcassets */; };
 		2133B4551CA377950032DEF7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2133B4531CA377950032DEF7 /* LaunchScreen.storyboard */; };
 		2133B4601CA377950032DEF7 /* TableViewModelUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2133B45F1CA377950032DEF7 /* TableViewModelUITests.m */; };
+		214055F81CB360E3005B0DF6 /* SWCellFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 214055F21CB360E3005B0DF6 /* SWCellFactory.m */; };
+		214055F91CB360E3005B0DF6 /* SWTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 214055F41CB360E3005B0DF6 /* SWTableViewController.m */; };
+		214055FA1CB360E3005B0DF6 /* SWTableViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 214055F71CB360E3005B0DF6 /* SWTableViewModel.m */; };
+		21A9E20C1CA8039D004F7EB9 /* TableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 21A9E20B1CA8039D004F7EB9 /* TableViewCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,6 +47,15 @@
 		2133B45B1CA377950032DEF7 /* TableViewModelUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TableViewModelUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2133B45F1CA377950032DEF7 /* TableViewModelUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TableViewModelUITests.m; sourceTree = "<group>"; };
 		2133B4611CA377950032DEF7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		214055F11CB360E3005B0DF6 /* SWCellFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWCellFactory.h; sourceTree = "<group>"; };
+		214055F21CB360E3005B0DF6 /* SWCellFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWCellFactory.m; sourceTree = "<group>"; };
+		214055F31CB360E3005B0DF6 /* SWTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWTableViewController.h; sourceTree = "<group>"; };
+		214055F41CB360E3005B0DF6 /* SWTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWTableViewController.m; sourceTree = "<group>"; };
+		214055F51CB360E3005B0DF6 /* SWTableViewModel+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SWTableViewModel+Private.h"; sourceTree = "<group>"; };
+		214055F61CB360E3005B0DF6 /* SWTableViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWTableViewModel.h; sourceTree = "<group>"; };
+		214055F71CB360E3005B0DF6 /* SWTableViewModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWTableViewModel.m; sourceTree = "<group>"; };
+		21A9E20A1CA8039D004F7EB9 /* TableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TableViewCell.h; sourceTree = "<group>"; };
+		21A9E20B1CA8039D004F7EB9 /* TableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TableViewCell.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +97,7 @@
 		2133B4411CA377950032DEF7 /* TableViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				214055F01CB360E3005B0DF6 /* SRC */,
 				2133B4451CA377950032DEF7 /* AppDelegate.h */,
 				2133B4461CA377950032DEF7 /* AppDelegate.m */,
 				2133B4481CA377950032DEF7 /* MasterViewController.h */,
@@ -95,6 +109,8 @@
 				2133B4531CA377950032DEF7 /* LaunchScreen.storyboard */,
 				2133B4561CA377950032DEF7 /* Info.plist */,
 				2133B4421CA377950032DEF7 /* Supporting Files */,
+				21A9E20A1CA8039D004F7EB9 /* TableViewCell.h */,
+				21A9E20B1CA8039D004F7EB9 /* TableViewCell.m */,
 			);
 			path = TableViewModel;
 			sourceTree = "<group>";
@@ -114,6 +130,20 @@
 				2133B4611CA377950032DEF7 /* Info.plist */,
 			);
 			path = TableViewModelUITests;
+			sourceTree = "<group>";
+		};
+		214055F01CB360E3005B0DF6 /* SRC */ = {
+			isa = PBXGroup;
+			children = (
+				214055F11CB360E3005B0DF6 /* SWCellFactory.h */,
+				214055F21CB360E3005B0DF6 /* SWCellFactory.m */,
+				214055F31CB360E3005B0DF6 /* SWTableViewController.h */,
+				214055F41CB360E3005B0DF6 /* SWTableViewController.m */,
+				214055F51CB360E3005B0DF6 /* SWTableViewModel+Private.h */,
+				214055F61CB360E3005B0DF6 /* SWTableViewModel.h */,
+				214055F71CB360E3005B0DF6 /* SWTableViewModel.m */,
+			);
+			path = SRC;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -218,8 +248,12 @@
 			files = (
 				2133B4471CA377950032DEF7 /* AppDelegate.m in Sources */,
 				2133B44A1CA377950032DEF7 /* MasterViewController.m in Sources */,
+				214055F81CB360E3005B0DF6 /* SWCellFactory.m in Sources */,
+				214055FA1CB360E3005B0DF6 /* SWTableViewModel.m in Sources */,
 				2133B4441CA377950032DEF7 /* main.m in Sources */,
 				2133B44D1CA377950032DEF7 /* DetailViewController.m in Sources */,
+				214055F91CB360E3005B0DF6 /* SWTableViewController.m in Sources */,
+				21A9E20C1CA8039D004F7EB9 /* TableViewCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -406,6 +440,7 @@
 				2133B4661CA377950032DEF7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		2133B4671CA377950032DEF7 /* Build configuration list for PBXNativeTarget "TableViewModelUITests" */ = {
 			isa = XCConfigurationList;
@@ -414,6 +449,7 @@
 				2133B4691CA377950032DEF7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

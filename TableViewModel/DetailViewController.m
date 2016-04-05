@@ -7,8 +7,12 @@
 //
 
 #import "DetailViewController.h"
+#import "SWTableViewController.h"
 
 @interface DetailViewController ()
+{
+    SWTableViewController* _tableViewController;
+}
 
 @end
 
@@ -19,28 +23,53 @@
 - (void)setDetailItem:(id)newDetailItem {
     if (_detailItem != newDetailItem) {
         _detailItem = newDetailItem;
-            
-        // Update the view.
-        [self configureView];
-    }
-}
-
-- (void)configureView {
-    // Update the user interface for the detail item.
-    if (self.detailItem) {
-        self.detailDescriptionLabel.text = [self.detailItem description];
     }
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
-    [self configureView];
+    _tableViewController = [[SWTableViewController alloc] init];
+    [self.view addSubview:_tableViewController.tableView];
+
+    SWTableViewModel* viewModel = [SWTableViewModel new];
+    SWTableSectionViewModel* section = [SWTableSectionViewModel new];
+    section.rows = @[
+        @{@"text": @"text 1"},
+        @{@"text": @"text 2"},
+        @{@"text": @"text 3"},
+        @{@"text": @"text 4"},
+        @{@"text": @"text 5"},
+        @{@"text": @"text 6"},
+        @{@"text": @"text 7"},
+        @{@"text": @"text 8"},
+        @{@"text": @"text 9"},
+        @{@"text": @"text 10"},
+        @{@"text": @"text 11"},
+        @{@"text": @"text 12"},
+        @{@"text": @"text 13"},
+    ];
+    [viewModel insertObject:section inSectionsAtIndex:0];
+    _tableViewController.model = viewModel;
+
+    // self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+    //     initWithBarButtonSystemItem:UIBarButtonSystemItemEdit
+    //                          target:self
+    //                          action:@selector(toggleEdit:)];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+- (void)viewWillLayoutSubviews {
+    CGRect bounds = self.view.bounds;
+    bounds.origin.y += [self.topLayoutGuide length];
+    bounds.size.height -= bounds.origin.y;
+    _tableViewController.tableView.frame = bounds;
+}
+
+- (void)toggleEdit:(UIBarButtonItem*)btn {
+    btn.style = UIBarButtonSystemItemEdit == btn.style
+                    ? UIBarButtonItemStyleDone
+                    : UIBarButtonSystemItemEdit;
+    _tableViewController.tableView.editing =
+        btn.style == UIBarButtonItemStyleDone;
 }
 
 @end
