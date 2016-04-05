@@ -8,6 +8,7 @@
 
 #import "DetailViewController.h"
 #import "SWTableViewController.h"
+#import "SWCellDecorator.h"
 
 @interface DetailViewController ()
 {
@@ -31,6 +32,8 @@
     _tableViewController = [[SWTableViewController alloc] init];
     [self.view addSubview:_tableViewController.tableView];
 
+    _tableViewController.cellDecorator = [SWCellHeadSeperatorLineDecorator new];
+    _tableViewController.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     _tableViewController.model = [self testViewModel];
 
     // self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
@@ -47,7 +50,6 @@
 }
 
 - (SWTableViewModel*)testViewModel {
-    _tableViewController.tableView.separatorInset = UIEdgeInsetsMake(0, 0, 0, 0);
     return [SWTableViewModel newWithRows:@[
         @{@"text": @"text 0"},
         @{@"text": @"text 1"},

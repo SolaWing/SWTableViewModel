@@ -46,7 +46,7 @@
     return [SWCellFactory defaultFactory];
 }
 
-- (id)viewModelForRowAtModelIndexPath:(NSIndexPath *)indexPath {
+- (id)modelForRowAtModelIndexPath:(NSIndexPath *)indexPath {
     return [[_model objectInSectionsAtIndex:indexPath.section]
         objectInRowsAtIndex:indexPath.row];
 }
@@ -62,10 +62,14 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell;
-    id viewModel = [self viewModelForRowAtModelIndexPath:indexPath];
+    id viewModel = [self modelForRowAtModelIndexPath:indexPath];
     cell = [self.cellFactory cellForTableView:tableView model:viewModel];
 
     NSParameterAssert(cell);
+    if (_cellDecorator && [_cellDecorator respondsToSelector:@selector(tableView:decorateCell:forModel:atIndexPath:)]) {
+        [_cellDecorator tableView:tableView decorateCell:cell forModel:viewModel atIndexPath:indexPath];
+    }
+
     return cell;
 }
 
@@ -80,13 +84,17 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    id viewModel = [self viewModelForRowAtModelIndexPath:indexPath];
-    return [self.cellFactory heightForTableView:tableView model:viewModel];
+    id viewModel = [self modelForRowAtModelIndexPath:indexPath];
+    CGFloat height = [self.cellFactory heightForTableView:tableView model:viewModel];
+    if (_cellDecorator && [_cellDecorator respondsToSelector:@selector(tableView:suggestHeight:forModel:atIndexPath:)]) {
+        [_cellDecorator tableView:tableView suggestHeight:&height forModel:viewModel atIndexPath:indexPath];
+    }
+    return height;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (!tableView.editing && _model.selectModel) {
-        id viewModel = [self viewModelForRowAtModelIndexPath:indexPath];
+        id viewModel = [self modelForRowAtModelIndexPath:indexPath];
         _model.selectModel(_model, viewModel);
 
         // after callback, clear selection

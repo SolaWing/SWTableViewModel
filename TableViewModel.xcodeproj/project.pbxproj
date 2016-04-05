@@ -18,6 +18,7 @@
 		214055F81CB360E3005B0DF6 /* SWCellFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 214055F21CB360E3005B0DF6 /* SWCellFactory.m */; };
 		214055F91CB360E3005B0DF6 /* SWTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 214055F41CB360E3005B0DF6 /* SWTableViewController.m */; };
 		214055FA1CB360E3005B0DF6 /* SWTableViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 214055F71CB360E3005B0DF6 /* SWTableViewModel.m */; };
+		214056061CB3BEA6005B0DF6 /* SWCellDecorator.m in Sources */ = {isa = PBXBuildFile; fileRef = 214056051CB3BEA6005B0DF6 /* SWCellDecorator.m */; };
 		21A9E20C1CA8039D004F7EB9 /* TableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 21A9E20B1CA8039D004F7EB9 /* TableViewCell.m */; };
 /* End PBXBuildFile section */
 
@@ -54,6 +55,9 @@
 		214055F51CB360E3005B0DF6 /* SWTableViewModel+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SWTableViewModel+Private.h"; sourceTree = "<group>"; };
 		214055F61CB360E3005B0DF6 /* SWTableViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWTableViewModel.h; sourceTree = "<group>"; };
 		214055F71CB360E3005B0DF6 /* SWTableViewModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWTableViewModel.m; sourceTree = "<group>"; };
+		214056011CB3B637005B0DF6 /* SWCellDecoratorProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWCellDecoratorProtocol.h; sourceTree = "<group>"; };
+		214056041CB3BEA6005B0DF6 /* SWCellDecorator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWCellDecorator.h; sourceTree = "<group>"; };
+		214056051CB3BEA6005B0DF6 /* SWCellDecorator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWCellDecorator.m; sourceTree = "<group>"; };
 		21A9E20A1CA8039D004F7EB9 /* TableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TableViewCell.h; sourceTree = "<group>"; };
 		21A9E20B1CA8039D004F7EB9 /* TableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TableViewCell.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -111,6 +115,8 @@
 				2133B4421CA377950032DEF7 /* Supporting Files */,
 				21A9E20A1CA8039D004F7EB9 /* TableViewCell.h */,
 				21A9E20B1CA8039D004F7EB9 /* TableViewCell.m */,
+				214056041CB3BEA6005B0DF6 /* SWCellDecorator.h */,
+				214056051CB3BEA6005B0DF6 /* SWCellDecorator.m */,
 			);
 			path = TableViewModel;
 			sourceTree = "<group>";
@@ -142,6 +148,7 @@
 				214055F51CB360E3005B0DF6 /* SWTableViewModel+Private.h */,
 				214055F61CB360E3005B0DF6 /* SWTableViewModel.h */,
 				214055F71CB360E3005B0DF6 /* SWTableViewModel.m */,
+				214056011CB3B637005B0DF6 /* SWCellDecoratorProtocol.h */,
 			);
 			path = SRC;
 			sourceTree = "<group>";
@@ -248,6 +255,7 @@
 			files = (
 				2133B4471CA377950032DEF7 /* AppDelegate.m in Sources */,
 				2133B44A1CA377950032DEF7 /* MasterViewController.m in Sources */,
+				214056061CB3BEA6005B0DF6 /* SWCellDecorator.m in Sources */,
 				214055F81CB360E3005B0DF6 /* SWCellFactory.m in Sources */,
 				214055FA1CB360E3005B0DF6 /* SWTableViewModel.m in Sources */,
 				2133B4441CA377950032DEF7 /* main.m in Sources */,
