@@ -9,6 +9,10 @@
 #import <UIKit/UIKit.h>
 #import "SWCellFactory.h"
 
-@interface TableViewCell : UITableViewCell
+@interface TableViewCell : UITableViewCell <SWFactoryCell>
+
+@end
+
+@interface SeperatorCell : UITableViewCell <SWFactoryCell>
 
 @end
