@@ -13,6 +13,7 @@
 @interface SWTableSectionViewModel : NSObject
 
 + (instancetype)newWithRows:(NSArray*)rows;
++ (instancetype)newWithRows:(NSArray*)rows header:(id)header footer:(id)footer;
 
 @property (nonatomic, strong) id header;    ///< header view model
 @property (nonatomic, strong) id footer;    ///< footer view model
@@ -41,11 +42,12 @@
 + (instancetype)newWithRows:(NSArray*)rows;
 /** init with a array of sections */
 + (instancetype)newWithSections:(NSArray*)sections;
+/** init with a array of array of rows */
++ (instancetype)newWithSectionRows:(NSArray*)sections;
 
 @property (nonatomic, weak) id<SWTableViewModelDelegate> delegate;
 /** if need to change section, use KVC mutable array api */
 @property (nonatomic, copy, readonly) NSArray<SWTableSectionViewModel*>* sections;
-@property (nonatomic, copy) void (^selectModel)(SWTableViewModel *sender, id rowModel);
 
 /** NOTE will raise exception for invalid indexPath */
 - (id)modelAtIndexPath:(NSIndexPath*)indexPath;
@@ -54,6 +56,7 @@
 - (void)selectModelAtIndexPath:(NSIndexPath*)indexPath;
 
 #pragma mark - KVC array accessors for sections
+- (NSUInteger)indexOfObjectInSections:(SWTableSectionViewModel*)section;
 - (NSUInteger)countOfSections;
 - (SWTableSectionViewModel *)objectInSectionsAtIndex:(NSUInteger)index;
 - (void)getSections:(SWTableSectionViewModel * __unsafe_unretained [])buffer range:(NSRange)range;

@@ -12,6 +12,10 @@
 // FIXME: how to implementation observing change with viewModel?
 @implementation SWTableViewController
 
+- (void)dealloc {
+    self.model = nil; // release KVO
+}
+
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
         _clearsSelectionOnViewWillAppear = YES;
@@ -36,8 +40,6 @@
 - (void)loadView {
     self.tableView = [[UITableView alloc] initWithFrame:[UIScreen mainScreen].bounds
                                                   style:UITableViewStylePlain];
-    self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
-    self.tableView.separatorColor = [UIColor blueColor];
 }
 
 - (UITableView *)tableView {
@@ -57,9 +59,110 @@
 
 - (void)setModel:(SWTableViewModel *)model {
     if (_model != model) {
+        if (_model && _syncing) {
+            [self unbindModel:_model];
+        }
         _model = model;
         [self.tableView reloadData];
+        if (_model && _syncing) {
+            [self bindModel:_model];
+        }
     }
+}
+
+- (void)setSyncing:(bool)syncing {
+    if (_syncing != syncing) {
+        _syncing = syncing;
+        if (_model) {
+            if (_syncing) {
+                [self bindModel:_model];
+            } else {
+                [self unbindModel:_model];
+            }
+        }
+    }
+}
+
+- (void)bindModel:(SWTableViewModel*)model {
+    [model addObserver:self forKeyPath:@"sections" options:NSKeyValueObservingOptionOld|NSKeyValueObservingOptionNew context:@"sections"];
+    for (SWTableSectionViewModel* element in model.sections){
+        [element addObserver:self forKeyPath:@"rows" options:0 context:@"rows"];
+    }
+}
+
+- (void)unbindModel:(SWTableViewModel*)model {
+    for (SWTableSectionViewModel* element in model.sections){
+        [element removeObserver:self forKeyPath:@"rows" context:@"rows"];
+    }
+    [model removeObserver:self forKeyPath:@"sections" context:@"sections"];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
+    if (context == @"sections") {
+        NSParameterAssert([NSThread isMainThread]);
+        // deal section KVO change
+        NSArray* oldSections = change[NSKeyValueChangeOldKey];
+        NSArray* newSections = change[NSKeyValueChangeNewKey];
+        for (SWTableSectionViewModel* element in oldSections){
+            [element removeObserver:self forKeyPath:@"rows" context:@"rows"];
+        }
+        for (SWTableSectionViewModel* element in newSections){
+            [element addObserver:self forKeyPath:@"rows" options:0 context:@"rows"];
+        }
+
+        NSKeyValueChange kind = [change[NSKeyValueChangeKindKey] integerValue];
+        SEL updateSEL;
+        switch( kind ){
+            case NSKeyValueChangeReplacement:
+                updateSEL = @selector(reloadSections:withRowAnimation:);
+                goto PartialUpdateSection;
+            case NSKeyValueChangeRemoval:
+                updateSEL = @selector(deleteSections:withRowAnimation:);
+                goto PartialUpdateSection;
+            case NSKeyValueChangeInsertion:
+                updateSEL = @selector(insertSections:withRowAnimation:);
+            PartialUpdateSection: {
+                NSIndexSet* indexes = change[NSKeyValueChangeIndexesKey];
+                void(*imp)(UITableView*, SEL, NSIndexSet*, UITableViewRowAnimation)
+                    = (void*)[self.tableView methodForSelector:updateSEL];
+                imp(self.tableView, updateSEL, indexes, UITableViewRowAnimationAutomatic);
+            } return;
+            case NSKeyValueChangeSetting: {
+                [self.tableView reloadData];
+            } return;
+        } return;
+    } else if (context == @"rows") {
+        NSParameterAssert([NSThread isMainThread]);
+
+        NSKeyValueChange kind = [change[NSKeyValueChangeKindKey] integerValue];
+        NSUInteger section = [_model indexOfObjectInSections:object];
+        SEL updateSEL;
+        switch( kind ){
+            case NSKeyValueChangeReplacement:
+                updateSEL = @selector(reloadRowsAtIndexPaths:withRowAnimation:);
+                goto PartialUpdate;
+            case NSKeyValueChangeRemoval:
+                updateSEL = @selector(deleteRowsAtIndexPaths:withRowAnimation:);
+                goto PartialUpdate;
+            case NSKeyValueChangeInsertion:
+                updateSEL = @selector(insertRowsAtIndexPaths:withRowAnimation:);
+            PartialUpdate: {
+                NSIndexSet* indexes = change[NSKeyValueChangeIndexesKey];
+                NSMutableArray* indexPaths = [NSMutableArray new];
+                [indexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop){
+                    [indexPaths addObject:[NSIndexPath indexPathForRow:idx inSection:section]];
+                }];
+                void (*imp)(UITableView*, SEL, NSArray*, UITableViewRowAnimation)
+                    = (void*)[self.tableView methodForSelector:updateSEL];
+                imp(self.tableView, updateSEL, indexPaths, UITableViewRowAnimationAutomatic);
+            } return;
+            case NSKeyValueChangeSetting: {
+                [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:section]
+                              withRowAnimation:UITableViewRowAnimationAutomatic];
+            } return;
+        } return;
+    }
+    [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
 - (id<SWCellFactory>)cellFactory {

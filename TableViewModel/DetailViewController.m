@@ -36,6 +36,11 @@
     _tableViewController.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     _tableViewController.model = [self testViewModel];
 
+    _tableViewController.syncing = YES;
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+        initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+                             target:self action:@selector(updateSections)];
+
     // self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
     //     initWithBarButtonSystemItem:UIBarButtonSystemItemEdit
     //                          target:self
@@ -97,6 +102,113 @@
     _tableViewController.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     [viewModel insertObject:section inSectionsAtIndex:0];
     return viewModel;
+}
+
+- (void)updateSections {
+    SWTableViewModel* model = _tableViewController.model;
+    CGFloat random = arc4random() / (double)UINT32_MAX ;
+    if (random > 6/8.0) {
+        if (model.countOfSections == 0) { return; }
+        [self addRows];
+    } else if (random > 2/4.0) {
+        if (model.countOfSections == 0) { return; }
+        NSMutableIndexSet* indexes = [NSMutableIndexSet indexSetWithIndex:0];
+        [indexes addIndex:model.countOfSections-1];
+        [model removeSectionsAtIndexes:indexes];
+    } else if (random > 1/4.0) {
+        // insert
+        [model insertSections:@[
+            [SWTableSectionViewModel newWithRows:@[
+                @{@"text": @"insert 1 section 0"},
+                @{@"text": @"insert 1 section 1"},
+                @{@"text": @"insert 1 section 2"},
+                @{@"text": @"insert 1 section 3"},
+            ] header:@"Insert 1" footer:nil],
+            [SWTableSectionViewModel newWithRows:@[
+                @{@"text": @"insert 2 section 0"},
+                @{@"text": @"insert 2 section 1"},
+                @{@"text": @"insert 2 section 2"},
+                @{@"text": @"insert 2 section 3"},
+            ] header:nil footer:@"footer 2"],
+        ] atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0,2)]];
+    } else if (model.countOfSections < 2) {
+        _tableViewController.model = [SWTableViewModel newWithSectionRows:@[
+            @[
+                @{@"text": @"section1 0"},
+                @{@"text": @"section1 1"},
+                @{@"text": @"section1 2"},
+                @{@"text": @"section1 3"},
+            ],
+            @[
+                @{@"text": @"section2 0"},
+                @{@"text": @"section2 1"},
+                @{@"text": @"section2 2"},
+                @{@"text": @"section2 3"},
+            ],
+        ]];
+    } else {
+         // replace
+        [model replaceObjectInSectionsAtIndex:1 withObject:[SWTableSectionViewModel newWithRows:@[
+            @{@"text": @"replace section 0"},
+            @{@"text": @"replace section 1"},
+            @{@"text": @"replace section 2"},
+            @{@"text": @"replace section 3"},
+        ]]];
+    }
+}
+
+- (void)addRow {
+    SWTableSectionViewModel* section = [_tableViewController.model objectInSectionsAtIndex:0];
+    [section insertObject:@{@"text": [NSString stringWithFormat:@"addRow %@", [NSDate date]]}
+            inRowsAtIndex:[section countOfRows]/2];
+}
+
+- (void)addRows {
+    CGFloat random = arc4random() / (double)UINT32_MAX ;
+    if (random > 2/4.0) {
+        return [self deleteRows];
+    } else if (random > 1/4.0) {
+        return [self replaceRows];
+    }
+    SWTableSectionViewModel* section = [_tableViewController.model objectInSectionsAtIndex:0];
+    id desc = [NSDate date];
+    [section insertRows:@[
+             @{@"text": [NSString stringWithFormat:@"addRow 1 %@", desc]},
+             @{@"text": [NSString stringWithFormat:@"addRow 2 %@", desc]},
+    ] atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange([section countOfRows]/3, 2)]];
+}
+
+- (void)replaceRows {
+    SWTableSectionViewModel* section = [_tableViewController.model objectInSectionsAtIndex:0];
+    if (section.countOfRows < 10) {
+        section.rows = @[
+            @{@"text": @"text 0"},
+            @{@"text": @"text 1"},
+            @{@"text": @"text 2"},
+            @{@"text": @"text 3"},
+            @{@"text": @"text 4"},
+            @{@"text": @"text 5"},
+            @{@"text": @"text 6"},
+            @{@"text": @"text 7"},
+            @{@"text": @"text 8"},
+            @{@"text": @"text 9"},
+        ]; return;
+    }
+    NSMutableIndexSet* indexes = [NSMutableIndexSet indexSetWithIndex:[section countOfRows]/3-1];
+    [indexes addIndex:[section countOfRows]/3+1]; // the same index will ignore
+    id desc = [NSDate date];
+    [section replaceRowsAtIndexes:indexes withRows:@[
+        @{@"text": [NSString stringWithFormat:@"replaceRows 1 %@", desc]},
+        @{@"text": [NSString stringWithFormat:@"replaceRows 2 %@", desc]},
+    ]];
+}
+
+- (void)deleteRows {
+    SWTableSectionViewModel* section = [_tableViewController.model objectInSectionsAtIndex:0];
+    if (section.countOfRows < 3) { return; }
+    NSMutableIndexSet* indexes = [NSMutableIndexSet indexSetWithIndex:[section countOfRows]/3-1];
+    [indexes addIndex:[section countOfRows]/3+1]; // the same index will ignore
+    [section removeRowsAtIndexes:indexes];
 }
 
 - (void)toggleEdit:(UIBarButtonItem*)btn {

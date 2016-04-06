@@ -27,6 +27,14 @@
     return ret;
 }
 
++ (instancetype)newWithSectionRows:(NSArray *)sections {
+    NSMutableArray* sectionModels = [NSMutableArray arrayWithCapacity:sections.count];
+    for (id element in sections){
+        [sectionModels addObject:[SWTableSectionViewModel newWithRows:element]];
+    }
+    return [self newWithSections:sectionModels];
+}
+
 - (instancetype)init {
     if (self = [super init]) {
         _sections = [NSMutableArray new];
@@ -47,6 +55,9 @@
 }
 
 #pragma mark - KVC array accessors for sections
+- (NSUInteger)indexOfObjectInSections:(SWTableSectionViewModel*)section {
+    return [_sections indexOfObjectIdenticalTo:section];
+}
 - (NSUInteger)countOfSections { return _sections.count; }
 - (SWTableSectionViewModel *)objectInSectionsAtIndex:(NSUInteger)index { return _sections[index]; }
 - (void)getSections:(SWTableSectionViewModel * __unsafe_unretained [])buffer range:(NSRange)range {
@@ -90,6 +101,14 @@
 + (instancetype)newWithRows:(NSArray *)rows {
     SWTableSectionViewModel* ret = [self new];
     ret.rows = rows;
+    return ret;
+}
+
++ (instancetype)newWithRows:(NSArray*)rows header:(id)header footer:(id)footer {
+    SWTableSectionViewModel *ret = [self new];
+    ret.rows = rows;
+    ret.header = header;
+    ret.footer = footer;
     return ret;
 }
 

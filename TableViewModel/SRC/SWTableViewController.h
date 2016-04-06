@@ -18,6 +18,9 @@
 
 /** the viewModel used by tableView. when set to new model, call reloadData */
 @property (nonatomic, strong) SWTableViewModel* model;
+/** if YES, will observe changes in model and refresh tableView */
+@property (nonatomic) bool syncing;
+
 /** this class use self.view as tableView, subclass may implement loadView, getter, setter. */
 @property (nonatomic, strong) UITableView* tableView;
 
