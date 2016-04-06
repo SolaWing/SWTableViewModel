@@ -123,13 +123,21 @@
                 @{@"text": @"insert 1 section 1"},
                 @{@"text": @"insert 1 section 2"},
                 @{@"text": @"insert 1 section 3"},
-            ] header:@"Insert 1" footer:nil],
+            ] header:@"Insert 1" footer:@{
+                @"text":@"footer 1",
+                @"textColor":[UIColor blueColor],
+                @"backgroundColor":[UIColor greenColor],
+            }],
             [SWTableSectionViewModel newWithRows:@[
                 @{@"text": @"insert 2 section 0"},
                 @{@"text": @"insert 2 section 1"},
                 @{@"text": @"insert 2 section 2"},
                 @{@"text": @"insert 2 section 3"},
-            ] header:nil footer:@"footer 2"],
+            ] header:@{
+                @"text":@"header 2",
+                @"textColor":[UIColor blueColor],
+                @"backgroundColor":[UIColor greenColor],
+            } footer:@"footer 2"],
         ] atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0,2)]];
     } else if (model.countOfSections < 2) {
         _tableViewController.model = [SWTableViewModel newWithSectionRows:@[

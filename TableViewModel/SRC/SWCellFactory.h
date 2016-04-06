@@ -9,8 +9,8 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-/** protocol which cell need to follow for used in SWCellFactory */
-@protocol SWFactoryCell <NSObject>
+/** protocol which view need to follow for used in SWCellFactory */
+@protocol SWFactoryView <NSObject>
 
 @required
 - (void)loadModel:(id)model;
@@ -22,8 +22,15 @@
 
 @protocol SWCellFactory <NSObject>
 
+@required
 - (UITableViewCell *)cellForTableView:(UITableView *)tableView model:(id)model;
 - (CGFloat)heightForTableView:(UITableView *)tableView model:(id)model;
+
+@optional
+- (UIView*)sectionHeaderForTableView:(UITableView *)tableView model:(id)model;
+- (UIView*)sectionFooterForTableView:(UITableView *)tableView model:(id)model;
+- (CGFloat)heightForSectionHeaderInTableView:(UITableView *)tableView model:(id)model;
+- (CGFloat)heightForSectionFooterInTableView:(UITableView *)tableView model:(id)model;
 
 @end
 
@@ -34,11 +41,18 @@
 - (UITableViewCell *)cellForTableView:(UITableView *)tableView model:(id)model;
 - (CGFloat)heightForTableView:(UITableView *)tableView model:(id)model;
 
+- (UIView*)sectionHeaderForTableView:(UITableView *)tableView model:(id)model;
+- (UIView*)sectionFooterForTableView:(UITableView *)tableView model:(id)model;
+- (CGFloat)heightForSectionHeaderInTableView:(UITableView *)tableView model:(id)model;
+- (CGFloat)heightForSectionFooterInTableView:(UITableView *)tableView model:(id)model;
+
 @end
 
 /** app need to implement this or use subclass and implement method in this */
 @interface SWCellFactory (cellClass)
 
 - (Class)cellClassForModel:(id)model;
+- (Class)headerClassForModel:(id)model;
+- (Class)footerClassForModel:(id)model;
 
 @end

@@ -8,7 +8,7 @@
 
 #import "TableViewCell.h"
 
-@interface TableViewCell () <SWFactoryCell>
+@interface TableViewCell () <SWFactoryView>
 
 @end
 
@@ -50,6 +50,31 @@
         return model;
     }
     return [TableViewCell class];
+}
+
+- (Class)headerClassForModel:(id)model { return [UITableViewHeaderFooterView class]; }
+- (Class)footerClassForModel:(id)model { return [UITableViewHeaderFooterView class]; }
+
+@end
+
+@interface UITableViewHeaderFooterView (ViewModel) <SWFactoryView>
+
+@end
+
+@implementation UITableViewHeaderFooterView (ViewModel)
+
+- (void)loadModel:(id)model {
+    // UITableViewHeaderFooterView's textLabel style got reset, it's not dependable
+    // use NSAttributedString will cause crash.
+    // when floating and delete rows or sections, sectionView pos not get updated
+    // how awful the UITableViewHeaderFooterView is.
+    if ([model isKindOfClass:[NSString class]]) {
+        self.textLabel.text = model;
+    } else if ([model isKindOfClass:[NSDictionary class]]) {
+        [self.textLabel setValuesForKeysWithDictionary:model];
+        UIColor* backgroundColor = model[@"backgroundColor"];
+        if (backgroundColor) { self.contentView.backgroundColor = backgroundColor; }
+    }
 }
 
 @end

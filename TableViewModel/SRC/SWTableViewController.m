@@ -182,6 +182,16 @@
     return [_model countOfSections];
 }
 
+#pragma mark Cell
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    id viewModel = [self modelForRowAtModelIndexPath:indexPath];
+    CGFloat height = [self.cellFactory heightForTableView:tableView model:viewModel];
+    if (_cellDecorator && [_cellDecorator respondsToSelector:@selector(tableView:suggestHeight:forModel:atIndexPath:)]) {
+        [_cellDecorator tableView:tableView suggestHeight:&height forModel:viewModel atIndexPath:indexPath];
+    }
+    return height;
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell;
     id viewModel = [self modelForRowAtModelIndexPath:indexPath];
@@ -195,25 +205,44 @@
     return cell;
 }
 
-- (nullable NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    id title = [_model objectInSectionsAtIndex:section].header;
-    return [title isKindOfClass:[NSString class]] ? title : nil;
-}
-
-- (nullable NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    id title = [_model objectInSectionsAtIndex:section].footer;
-    return [title isKindOfClass:[NSString class]] ? title : nil;
-}
-
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    id viewModel = [self modelForRowAtModelIndexPath:indexPath];
-    CGFloat height = [self.cellFactory heightForTableView:tableView model:viewModel];
-    if (_cellDecorator && [_cellDecorator respondsToSelector:@selector(tableView:suggestHeight:forModel:atIndexPath:)]) {
-        [_cellDecorator tableView:tableView suggestHeight:&height forModel:viewModel atIndexPath:indexPath];
+#pragma mark header & footer
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    id header = [_model objectInSectionsAtIndex:section].header;
+    id<SWCellFactory> factory;
+    if (header && [(factory = self.cellFactory) respondsToSelector:@selector(heightForSectionHeaderInTableView:model:)]) {
+        return [factory heightForSectionHeaderInTableView:tableView model:header];
     }
-    return height;
+    return 0;
 }
 
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    id header = [_model objectInSectionsAtIndex:section].header;
+    id<SWCellFactory> factory;
+    if (header && [(factory = self.cellFactory) respondsToSelector:@selector(sectionHeaderForTableView:model:)]) {
+        return [factory sectionHeaderForTableView:tableView model:header];
+    }
+    return nil;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+    id footer = [_model objectInSectionsAtIndex:section].footer;
+    id<SWCellFactory> factory;
+    if (footer && [(factory = self.cellFactory) respondsToSelector:@selector(heightForSectionFooterInTableView:model:)]) {
+        return [factory heightForSectionFooterInTableView:tableView model:footer];
+    }
+    return 0;
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
+    id footer = [_model objectInSectionsAtIndex:section].footer;
+    id<SWCellFactory> factory;
+    if (footer && [(factory = self.cellFactory) respondsToSelector:@selector(sectionFooterForTableView:model:)]) {
+        return [factory sectionFooterForTableView:tableView model:footer];
+    }
+    return nil;
+}
+
+#pragma mark callback
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (!tableView.editing) {
         [_model selectModelAtIndexPath:indexPath];
