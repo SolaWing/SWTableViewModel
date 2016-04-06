@@ -12,7 +12,27 @@
 // FIXME: how to implementation observing change with viewModel?
 @implementation SWTableViewController
 
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+        _clearsSelectionOnViewWillAppear = YES;
+    }
+    return self;
+}
+
 #pragma mark - property
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if (_clearsSelectionOnViewWillAppear) {
+        UITableView* tableView = self.tableView;
+        NSArray* indexPaths = [tableView indexPathsForSelectedRows];
+        if (indexPaths.count > 0) {
+            for (NSIndexPath* element in indexPaths){
+                [tableView deselectRowAtIndexPath:element animated:YES];
+            }
+        }
+    }
+}
+
 - (void)loadView {
     self.tableView = [[UITableView alloc] initWithFrame:[UIScreen mainScreen].bounds
                                                   style:UITableViewStylePlain];
@@ -47,8 +67,7 @@
 }
 
 - (id)modelForRowAtModelIndexPath:(NSIndexPath *)indexPath {
-    return [[_model objectInSectionsAtIndex:indexPath.section]
-        objectInRowsAtIndex:indexPath.row];
+    return [_model modelAtIndexPath:indexPath];
 }
 
 #pragma mark - TableView Delegate
@@ -93,12 +112,8 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (!tableView.editing && _model.selectModel) {
-        id viewModel = [self modelForRowAtModelIndexPath:indexPath];
-        _model.selectModel(_model, viewModel);
-
-        // after callback, clear selection
-        [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    if (!tableView.editing) {
+        [_model selectModelAtIndexPath:indexPath];
     }
 }
 

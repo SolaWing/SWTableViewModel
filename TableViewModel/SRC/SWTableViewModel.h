@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+@protocol SWTableViewModelDelegate;
+
 @interface SWTableSectionViewModel : NSObject
 
 + (instancetype)newWithRows:(NSArray*)rows;
@@ -40,9 +42,16 @@
 /** init with a array of sections */
 + (instancetype)newWithSections:(NSArray*)sections;
 
+@property (nonatomic, weak) id<SWTableViewModelDelegate> delegate;
 /** if need to change section, use KVC mutable array api */
 @property (nonatomic, copy, readonly) NSArray<SWTableSectionViewModel*>* sections;
 @property (nonatomic, copy) void (^selectModel)(SWTableViewModel *sender, id rowModel);
+
+/** NOTE will raise exception for invalid indexPath */
+- (id)modelAtIndexPath:(NSIndexPath*)indexPath;
+
+/** these method only call delegate, subclass may override to implement it */
+- (void)selectModelAtIndexPath:(NSIndexPath*)indexPath;
 
 #pragma mark - KVC array accessors for sections
 - (NSUInteger)countOfSections;
@@ -58,5 +67,11 @@
 - (void)replaceSectionsAtIndexes:(NSIndexSet *)indexes withSections:(NSArray *)array;
 #pragma mark end sections
 #pragma mark -
+
+@end
+
+@protocol SWTableViewModelDelegate <NSObject>
+
+- (void)tableViewModel:(SWTableViewModel*)sender didSelectModel:(id)model;
 
 @end

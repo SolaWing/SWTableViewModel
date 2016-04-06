@@ -24,6 +24,9 @@
 /** decorator used to additional config for cell */
 @property (nonatomic, strong) id<SWCellDecorator> cellDecorator;
 
+// A Boolean value indicating if the controller clears the selection when the table appears
+@property (nonatomic) bool clearsSelectionOnViewWillAppear;
+
 /** return model in SWTableViewModel at indexPath */
 - (id)modelForRowAtModelIndexPath:(NSIndexPath *)indexPath;
 

@@ -34,6 +34,18 @@
     return self;
 }
 
+- (id)modelAtIndexPath:(NSIndexPath *)indexPath {
+    return [[self objectInSectionsAtIndex:indexPath.section] objectInRowsAtIndex:indexPath.row];
+}
+
+- (void)selectModelAtIndexPath:(NSIndexPath *)indexPath {
+    id delegate = _delegate;
+    if ([delegate respondsToSelector:@selector(tableViewModel:didSelectModel:)]) {
+        id model = [self modelAtIndexPath:indexPath];
+        [delegate tableViewModel:self didSelectModel:model];
+    }
+}
+
 #pragma mark - KVC array accessors for sections
 - (NSUInteger)countOfSections { return _sections.count; }
 - (SWTableSectionViewModel *)objectInSectionsAtIndex:(NSUInteger)index { return _sections[index]; }
