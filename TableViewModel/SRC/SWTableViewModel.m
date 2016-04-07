@@ -8,6 +8,8 @@
 
 #import "SWTableViewModel+Private.h"
 #import <UIKit/UIKit.h>
+#import <CoreFoundation/CoreFoundation.h>
+
 @implementation SWTableViewModel
 
 @synthesize sections = _sections;
@@ -78,7 +80,7 @@
         }
         indexPaths = [delegate tableViewModel:self wouldDeleteModels:models atIndexPaths:indexPaths];
     }
-    [self removeObjectFromSectionsAtIndexPaths:indexPaths];
+    [self removeObjectsAtIndexPaths:indexPaths];
 }
 
 
@@ -106,34 +108,6 @@
     [_sections removeObjectAtIndex:index];
 }
 
-- (void)removeObjectFromSectionsAtIndexPaths:(NSArray *)indexPaths {
-    NSUInteger sectionCount = _sections.count;
-    if (indexPaths.count > 0 && sectionCount > 0) {
-        size_t indexSetsSize = sizeof(CFTypeRef) * sectionCount;
-        CFTypeRef * indexSets = alloca( indexSetsSize );
-        memset(indexSets, 0, indexSetsSize);
-
-        // convert to array of indexSet
-        for (NSIndexPath* element in indexPaths) {
-            NSUInteger section = element.section;
-            NSMutableIndexSet *__unsafe_unretained index = (__bridge NSMutableIndexSet *)(indexSets[section]);
-            if ( index == nil ) {
-                indexSets[section] = CFBridgingRetain([NSMutableIndexSet new]);
-                index = (__bridge NSMutableIndexSet *)(indexSets[section]);
-            }
-            [index addIndex:element.row];
-        }
-        // reverse deleted section
-        for (NSInteger i = sectionCount - 1; i >= 0; --i) {
-            if (indexSets[i]) {
-                NSMutableIndexSet* index = CFBridgingRelease(indexSets[i]);
-                SWTableSectionViewModel* section = [self objectInSectionsAtIndex:i];
-                [section removeRowsAtIndexes:index];
-            }
-        }
-    }
-}
-
 - (void)removeSectionsAtIndexes:(NSIndexSet *)indexes {
     [_sections removeObjectsAtIndexes:indexes];
 }
@@ -147,10 +121,118 @@
 }
 
 #pragma mark end sections
-#pragma mark -
+
+#pragma mark - indexPaths version of modify models
+typedef struct {
+    CFMutableArrayRef models;
+    CFTypeRef indexSets;
+} _M_IPair;
+
+/** convert models pair with indexPaths to array pair with indexSet, and put into buffers */
+static void convertModelsOfIndexPathsToArrayOfIndexSets(NSArray* models, NSArray* indexPaths, _M_IPair* buffers, NSUInteger count) {
+    [models enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop){
+        NSIndexPath* indexPath = indexPaths[idx];
+        NSUInteger section = indexPath.section;
+        NSCParameterAssert( section < count );
+
+        _M_IPair* pair = buffers + section;
+        if (!(pair->indexSets)) {
+            pair->indexSets = CFBridgingRetain([NSMutableIndexSet new]);
+            pair->models = CFArrayCreateMutable(nil, 0, &kCFTypeArrayCallBacks);
+        }
+        NSMutableIndexSet* indexes = (__bridge id)(pair->indexSets);
+        NSMutableArray* models = (__bridge id)(pair->models);
+        if ([indexes containsIndex:indexPath.row]) {
+            NSLog(@"WARNING: repeat indexPath %@ for model %@", indexPath, obj);
+        } else {
+            NSUInteger index = [indexes countOfIndexesInRange:NSMakeRange(0, indexPath.row)];
+            [models insertObject:obj atIndex:index];
+            [indexes addIndex:indexPath.row];
+        }
+    }];
+}
+
+- (void)insertObjects:(NSArray *)models atIndexPaths:(NSArray *)indexPaths {
+    NSParameterAssert( models.count <= indexPaths.count );
+    NSUInteger sectionCount = _sections.count;
+    if (models.count > 0 && sectionCount > 0) {
+        size_t totalSize = sizeof(_M_IPair) * sectionCount;
+        _M_IPair * pairs = alloca( totalSize );
+        memset(pairs, 0, totalSize);
+
+        convertModelsOfIndexPathsToArrayOfIndexSets(models, indexPaths, pairs, sectionCount);
+        for (NSUInteger i = 0; i < sectionCount; ++i) {
+            if (pairs[i].indexSets) {
+                NSIndexSet* indexSet = CFBridgingRelease(pairs[i].indexSets);
+                NSArray* array = CFBridgingRelease(pairs[i].models);
+                SWTableSectionViewModel* section = [self objectInSectionsAtIndex:i];
+                [section insertRows:array atIndexes:indexSet];
+            }
+        }
+    }
+}
+
+- (void)replaceObjects:(NSArray *)models atIndexPaths:(NSArray *)indexPaths {
+    NSParameterAssert( models.count <= indexPaths.count );
+    NSUInteger sectionCount = _sections.count;
+    if (models.count > 0 && sectionCount > 0) {
+        size_t totalSize = sizeof(_M_IPair) * sectionCount;
+        _M_IPair * pairs = alloca( totalSize );
+        memset(pairs, 0, totalSize);
+
+        convertModelsOfIndexPathsToArrayOfIndexSets(models, indexPaths, pairs, sectionCount);
+        for (NSUInteger i = 0; i < sectionCount; ++i) {
+            if (pairs[i].indexSets) {
+                NSIndexSet* indexSet = CFBridgingRelease(pairs[i].indexSets);
+                NSArray* array = CFBridgingRelease(pairs[i].models);
+                SWTableSectionViewModel* section = [self objectInSectionsAtIndex:i];
+                [section replaceRowsAtIndexes:indexSet withRows:array];
+            }
+        }
+    }
+}
+
+/** convert indexPaths to indexSet and put in buffer, should release it if not equal to nil */
+static void convertIndexPathsToIndexSets(NSArray* indexPaths, CFTypeRef* sectionBuffers, NSUInteger count) {
+    // convert to array of indexSet
+    for (NSIndexPath* element in indexPaths) {
+        NSUInteger section = element.section;
+        NSCParameterAssert( section < count );
+
+        NSMutableIndexSet *__unsafe_unretained index;
+        if ( !sectionBuffers[section] ) {
+            sectionBuffers[section] = CFBridgingRetain([NSMutableIndexSet new]);
+            index = (__bridge NSMutableIndexSet *)(sectionBuffers[section]);
+        }
+        [index addIndex:element.row];
+    }
+}
+
+- (void)removeObjectsAtIndexPaths:(NSArray *)indexPaths {
+    NSUInteger sectionCount = _sections.count;
+    if (indexPaths.count > 0 && sectionCount > 0) {
+        size_t indexSetsSize = sizeof(CFTypeRef) * sectionCount;
+        CFTypeRef * indexSets = alloca( indexSetsSize );
+        memset(indexSets, 0, indexSetsSize);
+
+        convertIndexPathsToIndexSets(indexPaths, indexSets, sectionCount);
+
+        // reverse deleted section
+        for (NSInteger i = sectionCount - 1; i >= 0; --i) {
+            if (indexSets[i]) {
+                NSMutableIndexSet* index = CFBridgingRelease(indexSets[i]);
+                SWTableSectionViewModel* section = [self objectInSectionsAtIndex:i];
+                [section removeRowsAtIndexes:index];
+            }
+        }
+    }
+}
+
 
 @end
 
+
+#pragma mark - SWTableSectionViewModel
 @implementation SWTableSectionViewModel
 
 @synthesize rows = _rows;
@@ -177,8 +259,19 @@
     return sectionModels;
 }
 
+- (instancetype)init {
+    if (self = [super init]) {
+        _rows = [NSMutableArray new];
+    }
+    return self;
+}
+
 - (void)setRows:(NSArray *)rows {
-    _rows = [rows mutableCopy];
+    if (rows) {
+        _rows = [rows mutableCopy];
+    } else {
+        _rows = [NSMutableArray new];
+    }
 }
 
 

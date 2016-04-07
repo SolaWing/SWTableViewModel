@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, nullable) id header;    ///< header view model
 @property (nonatomic, strong, nullable) id footer;    ///< footer view model
-@property (nonatomic, copy, nullable) NSArray* rows;  ///< array of row view model
+@property (nonatomic, copy) NSArray* rows;  ///< array of row view model
 
 
 #pragma mark - KVC array accessors for rows
@@ -75,10 +75,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)insertSections:(NSArray *)array atIndexes:(NSIndexSet *)indexes;
 - (void)removeObjectFromSectionsAtIndex:(NSUInteger)index;
 - (void)removeSectionsAtIndexes:(NSIndexSet *)indexes;
-/** this really remove underlying models, which is different from deleteModelsAtIndexPaths. */
-- (void)removeObjectFromSectionsAtIndexPaths:(NSArray*)indexPaths;
 - (void)replaceObjectInSectionsAtIndex:(NSUInteger)index withObject:(SWTableSectionViewModel*)object;
 - (void)replaceSectionsAtIndexes:(NSIndexSet *)indexes withSections:(NSArray *)array;
+
+/** following methods as the indexPaths version of modify underlying models.
+ * the indexPath section should valid, and row will be batch packed in NSIndexSet */
+
+- (void)insertObjects:(NSArray*)models atIndexPaths:(NSArray*)indexPaths; ///< indexPath.row should be the result position
+- (void)replaceObjects:(NSArray*)models atIndexPaths:(NSArray*)indexPaths;
+- (void)removeObjectsAtIndexPaths:(NSArray*)indexPaths;
+
 #pragma mark end sections
 #pragma mark -
 
