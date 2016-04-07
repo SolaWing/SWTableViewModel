@@ -15,8 +15,12 @@
 @implementation TableViewCell
 
 - (void)loadModel:(id)model {
-    NSDictionary* dict = (id)model;
-    self.textLabel.text = dict[@"text"];
+    if ([model isKindOfClass:[NSDictionary class]]) {
+        NSDictionary* dict = (id)model;
+        self.textLabel.text = dict[@"text"];
+    } else if ([model isKindOfClass:[NSString class]] || [model isKindOfClass:[NSAttributedString class]]) {
+        self.textLabel.text = model;
+    }
 }
 
 @end

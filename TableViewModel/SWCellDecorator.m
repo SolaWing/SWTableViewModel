@@ -26,7 +26,7 @@
             CGRect frame = cell.bounds;
             CGFloat height = 1 / [UIScreen mainScreen].scale;
             frame.origin.y = frame.size.height - height;
-            frame.origin.x = 11;
+            frame.origin.x = 6;
             frame.size.width-=frame.origin.x;
             frame.size.height = height;
             separatorView = [[UIView alloc] initWithFrame:frame];

@@ -10,7 +10,7 @@
 #import "SWTableViewController.h"
 #import "SWCellDecorator.h"
 
-@interface DetailViewController ()
+@interface DetailViewController () <SWTableViewModelDelegate>
 {
     SWTableViewController* _tableViewController;
 }
@@ -34,12 +34,15 @@
 
     _tableViewController.cellDecorator = [SWCellHeadSeperatorLineDecorator new];
     _tableViewController.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    // _tableViewController.tableView.allowsMultipleSelectionDuringEditing = YES;
     _tableViewController.model = [self testViewModel];
 
     _tableViewController.syncing = YES;
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-        initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
-                             target:self action:@selector(updateSections)];
+    self.navigationItem.rightBarButtonItems = @[
+        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+            target:self action:@selector(updateSections)],
+        _tableViewController.editButtonItem,
+    ];
 
     // self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
     //     initWithBarButtonSystemItem:UIBarButtonSystemItemEdit
@@ -55,7 +58,7 @@
 }
 
 - (SWTableViewModel*)testViewModel {
-    return [SWTableViewModel newWithRows:@[
+    SWTableViewModel* model = [SWTableViewModel newWithRows:@[
         @{@"text": @"text 0"},
         @{@"text": @"text 1"},
         @{@"text": @"text 2"},
@@ -67,10 +70,13 @@
         @{@"text": @"text 8"},
         @{@"text": @"text 9"},
     ]];
+    model.delegate = self;
+    return model;
 }
 
 - (SWTableViewModel*)testUseCellAsSeperator {
     SWTableViewModel* viewModel = [SWTableViewModel new];
+    viewModel.delegate = self;
     SWTableSectionViewModel* section = [SWTableSectionViewModel new];
     section.rows = @[
         @{@"text": @"text 1"},
@@ -154,6 +160,7 @@
                 @{@"text": @"section2 3"},
             ],
         ]];
+        _tableViewController.model.delegate = self;
     } else {
          // replace
         [model replaceObjectInSectionsAtIndex:1 withObject:[SWTableSectionViewModel newWithRows:@[
@@ -226,5 +233,14 @@
     _tableViewController.tableView.editing =
         btn.style == UIBarButtonItemStyleDone;
 }
+
+#pragma mark - SWTableViewModelDelegate
+- (NSArray<NSIndexPath *> *)tableViewModel:(SWTableViewModel *)sender wouldDeleteModels:(NSArray *)models atIndexPaths:(NSArray<NSIndexPath *> *)indexPaths {
+    return indexPaths;
+}
+
+// - (BOOL)tableViewModel:(SWTableViewModel *)sender canEditModel:(id)model atIndexPath:(NSIndexPath *)indexPath {
+//     return YES;
+// }
 
 @end

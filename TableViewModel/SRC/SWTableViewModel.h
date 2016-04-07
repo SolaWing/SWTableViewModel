@@ -8,16 +8,19 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol SWTableViewModelDelegate;
 
 @interface SWTableSectionViewModel : NSObject
 
-+ (instancetype)newWithRows:(NSArray*)rows;
-+ (instancetype)newWithRows:(NSArray*)rows header:(id)header footer:(id)footer;
++ (instancetype)newWithRows:(nullable NSArray*)rows;
++ (instancetype)newWithRows:(nullable NSArray*)rows header:(nullable id)header footer:(nullable id)footer;
 
-@property (nonatomic, strong) id header;    ///< header view model
-@property (nonatomic, strong) id footer;    ///< footer view model
-@property (nonatomic, copy) NSArray* rows;  ///< array of row view model
+@property (nonatomic, strong, nullable) id header;    ///< header view model
+@property (nonatomic, strong, nullable) id footer;    ///< footer view model
+@property (nonatomic, copy, nullable) NSArray* rows;  ///< array of row view model
+
 
 #pragma mark - KVC array accessors for rows
 - (NSUInteger)countOfRows;
@@ -39,21 +42,24 @@
 @interface SWTableViewModel : NSObject
 
 /** init with a list as a section of rows */
-+ (instancetype)newWithRows:(NSArray*)rows;
++ (instancetype)newWithRows:(nullable NSArray*)rows;
 /** init with a array of sections */
-+ (instancetype)newWithSections:(NSArray*)sections;
++ (instancetype)newWithSections:(nullable NSArray*)sections;
 /** init with a array of array of rows */
-+ (instancetype)newWithSectionRows:(NSArray*)sections;
++ (instancetype)newWithSectionRows:(nullable NSArray*)sections;
 
-@property (nonatomic, weak) id<SWTableViewModelDelegate> delegate;
+@property (nonatomic, weak, nullable) id<SWTableViewModelDelegate> delegate;
 /** if need to change section, use KVC mutable array api */
 @property (nonatomic, copy, readonly) NSArray<SWTableSectionViewModel*>* sections;
 
 /** NOTE will raise exception for invalid indexPath */
 - (id)modelAtIndexPath:(NSIndexPath*)indexPath;
 
-/** these method only call delegate, subclass may override to implement it */
+/** these method should called by view, it only call delegate, subclass may override to implement it */
 - (void)selectModelAtIndexPath:(NSIndexPath*)indexPath;
+- (BOOL)canEditRowAtIndexPath:(NSIndexPath*)indexPath;
+- (void)deleteModelsAtIndexPaths:(NSArray<NSIndexPath*>*)indexPaths;
+
 
 #pragma mark - KVC array accessors for sections
 - (NSUInteger)indexOfObjectInSections:(SWTableSectionViewModel*)section;
@@ -66,6 +72,8 @@
 - (void)insertSections:(NSArray *)array atIndexes:(NSIndexSet *)indexes;
 - (void)removeObjectFromSectionsAtIndex:(NSUInteger)index;
 - (void)removeSectionsAtIndexes:(NSIndexSet *)indexes;
+/** this really remove underlying models, which is different from deleteModelsAtIndexPaths. */
+- (void)removeObjectFromSectionsAtIndexPaths:(NSArray*)indexPaths;
 - (void)replaceObjectInSectionsAtIndex:(NSUInteger)index withObject:(SWTableSectionViewModel*)object;
 - (void)replaceSectionsAtIndexes:(NSIndexSet *)indexes withSections:(NSArray *)array;
 #pragma mark end sections
@@ -75,6 +83,12 @@
 
 @protocol SWTableViewModelDelegate <NSObject>
 
-- (void)tableViewModel:(SWTableViewModel*)sender didSelectModel:(id)model;
+@optional
+- (void)tableViewModel:(SWTableViewModel*)sender didSelectModel:(id)model atIndexPath:(NSIndexPath*)indexPath;
+- (BOOL)tableViewModel:(SWTableViewModel*)sender canEditModel:(id)model atIndexPath:(NSIndexPath*)indexPath;
+/** return indexPaths which would really deleted, or nil to deny deleting */
+- (nullable NSArray<NSIndexPath*>*)tableViewModel:(SWTableViewModel*)sender wouldDeleteModels:(NSArray*)models atIndexPaths:(NSArray<NSIndexPath*>*)indexPaths;
 
 @end
+
+NS_ASSUME_NONNULL_END

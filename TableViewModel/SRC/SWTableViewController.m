@@ -98,6 +98,7 @@
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
+    // float section footer may move to bottom when partially update tableView
     if (context == @"sections") {
         NSParameterAssert([NSThread isMainThread]);
         // deal section KVO change
@@ -240,6 +241,22 @@
         return [factory sectionFooterForTableView:tableView model:footer];
     }
     return nil;
+}
+
+#pragma mark edit
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
+    [super setEditing:editing animated:animated];
+    [self.tableView setEditing:editing animated:animated];
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        [_model deleteModelsAtIndexPaths:@[indexPath]];
+    }
+}
+
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    return [_model canEditRowAtIndexPath:indexPath];
 }
 
 #pragma mark callback

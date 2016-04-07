@@ -48,16 +48,41 @@
 
 - (void)selectModelAtIndexPath:(NSIndexPath *)indexPath {
     id delegate = _delegate;
-    if ([delegate respondsToSelector:@selector(tableViewModel:didSelectModel:)]) {
+    if ([delegate respondsToSelector:@selector(tableViewModel:didSelectModel:atIndexPath:)]) {
         id model = [self modelAtIndexPath:indexPath];
-        [delegate tableViewModel:self didSelectModel:model];
+        [delegate tableViewModel:self didSelectModel:model atIndexPath:indexPath];
     }
 }
+
+- (BOOL)canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    id delegate = _delegate;
+    if ([delegate respondsToSelector:@selector(tableViewModel:canEditModel:atIndexPath:)]) {
+        id model = [self modelAtIndexPath:indexPath];
+        return [delegate tableViewModel:self canEditModel:model atIndexPath:indexPath];
+    }
+    return NO;
+}
+
+- (void)deleteModelsAtIndexPaths:(NSArray<NSIndexPath *> *)indexPaths {
+    if (indexPaths.count == 0) { return; }
+
+    id delegate = _delegate;
+    if ([delegate respondsToSelector:@selector(tableViewModel:wouldDeleteModels:atIndexPaths:)]) {
+        NSMutableArray* models = [NSMutableArray new];
+        for (NSIndexPath* element in indexPaths){
+            [models addObject:[self modelAtIndexPath:element]];
+        }
+        indexPaths = [delegate tableViewModel:self wouldDeleteModels:models atIndexPaths:indexPaths];
+    }
+    [self removeObjectFromSectionsAtIndexPaths:indexPaths];
+}
+
 
 #pragma mark - KVC array accessors for sections
 - (NSUInteger)indexOfObjectInSections:(SWTableSectionViewModel*)section {
     return [_sections indexOfObjectIdenticalTo:section];
 }
+
 - (NSUInteger)countOfSections { return _sections.count; }
 - (SWTableSectionViewModel *)objectInSectionsAtIndex:(NSUInteger)index { return _sections[index]; }
 - (void)getSections:(SWTableSectionViewModel * __unsafe_unretained [])buffer range:(NSRange)range {
@@ -75,6 +100,34 @@
 
 - (void)removeObjectFromSectionsAtIndex:(NSUInteger)index {
     [_sections removeObjectAtIndex:index];
+}
+
+- (void)removeObjectFromSectionsAtIndexPaths:(NSArray *)indexPaths {
+    NSUInteger sectionCount = _sections.count;
+    if (indexPaths.count > 0 && sectionCount > 0) {
+        size_t indexSetsSize = sizeof(CFTypeRef) * sectionCount;
+        CFTypeRef * indexSets = alloca( indexSetsSize );
+        memset(indexSets, 0, indexSetsSize);
+
+        // convert to array of indexSet
+        for (NSIndexPath* element in indexPaths) {
+            NSUInteger section = element.section;
+            NSMutableIndexSet *__unsafe_unretained index = (__bridge NSMutableIndexSet *)(indexSets[section]);
+            if ( index == nil ) {
+                indexSets[section] = CFBridgingRetain([NSMutableIndexSet new]);
+                index = (__bridge NSMutableIndexSet *)(indexSets[section]);
+            }
+            [index addIndex:element.row];
+        }
+        // reverse deleted section
+        for (NSInteger i = sectionCount - 1; i >= 0; --i) {
+            if (indexSets[i]) {
+                NSMutableIndexSet* index = CFBridgingRelease(indexSets[i]);
+                SWTableSectionViewModel* section = [self objectInSectionsAtIndex:i];
+                [section removeRowsAtIndexes:index];
+            }
+        }
+    }
 }
 
 - (void)removeSectionsAtIndexes:(NSIndexSet *)indexes {
@@ -115,6 +168,7 @@
 - (void)setRows:(NSArray *)rows {
     _rows = [rows mutableCopy];
 }
+
 
 #pragma mark - KVC array accessors for rows
 - (NSUInteger)countOfRows { return _rows.count; }
