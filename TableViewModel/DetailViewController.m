@@ -146,7 +146,8 @@
             } footer:@"footer 2"],
         ] atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0,2)]];
     } else if (model.countOfSections < 2) {
-        _tableViewController.model = [SWTableViewModel newWithSectionRows:@[
+        model.sections = [SWTableSectionViewModel arrayOfSectionsRows:@[
+        // _tableViewController.model = [SWTableViewModel newWithSectionRows:@[
             @[
                 @{@"text": @"section1 0"},
                 @{@"text": @"section1 1"},

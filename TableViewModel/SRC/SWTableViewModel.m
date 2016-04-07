@@ -28,11 +28,7 @@
 }
 
 + (instancetype)newWithSectionRows:(NSArray *)sections {
-    NSMutableArray* sectionModels = [NSMutableArray arrayWithCapacity:sections.count];
-    for (id element in sections){
-        [sectionModels addObject:[SWTableSectionViewModel newWithRows:element]];
-    }
-    return [self newWithSections:sectionModels];
+    return [self newWithSections:[SWTableSectionViewModel arrayOfSectionsRows:sections]];
 }
 
 - (instancetype)init {
@@ -40,6 +36,14 @@
         _sections = [NSMutableArray new];
     }
     return self;
+}
+
+- (void)setSections:(NSArray<SWTableSectionViewModel *> *)sections {
+    if (sections.count > 0) {
+        _sections = sections.mutableCopy;
+    } else {
+        _sections = [NSMutableArray new];
+    }
 }
 
 - (id)modelAtIndexPath:(NSIndexPath *)indexPath {
@@ -163,6 +167,14 @@
     ret.header = header;
     ret.footer = footer;
     return ret;
+}
+
++ (NSArray<SWTableSectionViewModel*>*)arrayOfSectionsRows:(NSArray*)sections {
+    NSMutableArray* sectionModels = [NSMutableArray arrayWithCapacity:sections.count];
+    for (id element in sections){
+        [sectionModels addObject:[SWTableSectionViewModel newWithRows:element]];
+    }
+    return sectionModels;
 }
 
 - (void)setRows:(NSArray *)rows {

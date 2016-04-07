@@ -16,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)newWithRows:(nullable NSArray*)rows;
 + (instancetype)newWithRows:(nullable NSArray*)rows header:(nullable id)header footer:(nullable id)footer;
+/** map each element to call newWithRows */
++ (NSArray<SWTableSectionViewModel*>*)arrayOfSectionsRows:(NSArray*)sections;
 
 @property (nonatomic, strong, nullable) id header;    ///< header view model
 @property (nonatomic, strong, nullable) id footer;    ///< footer view model
@@ -39,6 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+
 @interface SWTableViewModel : NSObject
 
 /** init with a list as a section of rows */
@@ -50,7 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, weak, nullable) id<SWTableViewModelDelegate> delegate;
 /** if need to change section, use KVC mutable array api */
-@property (nonatomic, copy, readonly) NSArray<SWTableSectionViewModel*>* sections;
+@property (nonatomic, copy) NSArray<SWTableSectionViewModel*>* sections;
 
 /** NOTE will raise exception for invalid indexPath */
 - (id)modelAtIndexPath:(NSIndexPath*)indexPath;
