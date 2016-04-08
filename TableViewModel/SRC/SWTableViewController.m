@@ -9,7 +9,6 @@
 #import "SWTableViewController.h"
 #import <objc/runtime.h>
 
-// FIXME: how to implementation observing change with viewModel?
 @implementation SWTableViewController
 
 - (void)dealloc {

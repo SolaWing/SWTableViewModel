@@ -7,7 +7,6 @@
 //
 
 #import "SWCellFactory.h"
-#import "TableViewCell.h"
 
 #define kDefaultSectionHeight 22
 

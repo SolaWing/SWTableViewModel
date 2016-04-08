@@ -115,7 +115,7 @@
     NSMutableDictionary* fetchChangedObjects = self.fetchChangedObjects;
 
     void ( ^__unsafe_unretained addObjectIndexPath )( id, NSIndexPath* ) = ^( id type, NSIndexPath* indexPath ) {
-        NSArray* changedObjects = fetchChangedObjects[type];
+        NSArray<NSMutableArray*>* changedObjects = fetchChangedObjects[type];
         if ( !changedObjects ) {
             changedObjects = [NSArray arrayWithObjects:
                        [NSMutableArray arrayWithObject:anObject],
