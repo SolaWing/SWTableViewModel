@@ -21,10 +21,19 @@
 		214056061CB3BEA6005B0DF6 /* SWCellDecorator.m in Sources */ = {isa = PBXBuildFile; fileRef = 214056051CB3BEA6005B0DF6 /* SWCellDecorator.m */; };
 		21A9E20C1CA8039D004F7EB9 /* TableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 21A9E20B1CA8039D004F7EB9 /* TableViewCell.m */; };
 		21DA35B21CB6076700FDE643 /* SWTableViewModel+NSFetchedResultsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21DA35B11CB6076700FDE643 /* SWTableViewModel+NSFetchedResultsController.m */; };
+		21DA35B51CB6632800FDE643 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 21DA35B31CB6632800FDE643 /* Model.xcdatamodeld */; };
+		21DA35C41CB66D2100FDE643 /* TableViewModelTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 21DA35BC1CB6661800FDE643 /* TableViewModelTests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		2133B45C1CA377950032DEF7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2133B4371CA377950032DEF7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2133B43E1CA377950032DEF7;
+			remoteInfo = TableViewModel;
+		};
+		21DA35BF1CB6661800FDE643 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2133B4371CA377950032DEF7 /* Project object */;
 			proxyType = 1;
@@ -63,6 +72,10 @@
 		21A9E20B1CA8039D004F7EB9 /* TableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TableViewCell.m; sourceTree = "<group>"; };
 		21DA35B01CB6076700FDE643 /* SWTableViewModel+NSFetchedResultsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SWTableViewModel+NSFetchedResultsController.h"; sourceTree = "<group>"; };
 		21DA35B11CB6076700FDE643 /* SWTableViewModel+NSFetchedResultsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "SWTableViewModel+NSFetchedResultsController.m"; sourceTree = "<group>"; };
+		21DA35B41CB6632800FDE643 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		21DA35BA1CB6661800FDE643 /* TableViewModelTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TableViewModelTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		21DA35BC1CB6661800FDE643 /* TableViewModelTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TableViewModelTests.m; sourceTree = "<group>"; };
+		21DA35BE1CB6661800FDE643 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +93,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		21DA35B71CB6661800FDE643 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -88,6 +108,7 @@
 			children = (
 				2133B4411CA377950032DEF7 /* TableViewModel */,
 				2133B45E1CA377950032DEF7 /* TableViewModelUITests */,
+				21DA35BB1CB6661800FDE643 /* TableViewModelTests */,
 				2133B4401CA377950032DEF7 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -97,6 +118,7 @@
 			children = (
 				2133B43F1CA377950032DEF7 /* TableViewModel.app */,
 				2133B45B1CA377950032DEF7 /* TableViewModelUITests.xctest */,
+				21DA35BA1CB6661800FDE643 /* TableViewModelTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -128,6 +150,7 @@
 			isa = PBXGroup;
 			children = (
 				2133B4431CA377950032DEF7 /* main.m */,
+				21DA35B31CB6632800FDE643 /* Model.xcdatamodeld */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -156,6 +179,15 @@
 				21DA35B11CB6076700FDE643 /* SWTableViewModel+NSFetchedResultsController.m */,
 			);
 			path = SRC;
+			sourceTree = "<group>";
+		};
+		21DA35BB1CB6661800FDE643 /* TableViewModelTests */ = {
+			isa = PBXGroup;
+			children = (
+				21DA35BC1CB6661800FDE643 /* TableViewModelTests.m */,
+				21DA35BE1CB6661800FDE643 /* Info.plist */,
+			);
+			path = TableViewModelTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -196,6 +228,24 @@
 			productReference = 2133B45B1CA377950032DEF7 /* TableViewModelUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		21DA35B91CB6661800FDE643 /* TableViewModelTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 21DA35C11CB6661800FDE643 /* Build configuration list for PBXNativeTarget "TableViewModelTests" */;
+			buildPhases = (
+				21DA35B61CB6661800FDE643 /* Sources */,
+				21DA35B71CB6661800FDE643 /* Frameworks */,
+				21DA35B81CB6661800FDE643 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				21DA35C01CB6661800FDE643 /* PBXTargetDependency */,
+			);
+			name = TableViewModelTests;
+			productName = TableViewModelTests;
+			productReference = 21DA35BA1CB6661800FDE643 /* TableViewModelTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -209,6 +259,10 @@
 						CreatedOnToolsVersion = 7.2;
 					};
 					2133B45A1CA377950032DEF7 = {
+						CreatedOnToolsVersion = 7.2;
+						TestTargetID = 2133B43E1CA377950032DEF7;
+					};
+					21DA35B91CB6661800FDE643 = {
 						CreatedOnToolsVersion = 7.2;
 						TestTargetID = 2133B43E1CA377950032DEF7;
 					};
@@ -229,6 +283,7 @@
 			targets = (
 				2133B43E1CA377950032DEF7 /* TableViewModel */,
 				2133B45A1CA377950032DEF7 /* TableViewModelUITests */,
+				21DA35B91CB6661800FDE643 /* TableViewModelTests */,
 			);
 		};
 /* End PBXProject section */
@@ -251,6 +306,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		21DA35B81CB6661800FDE643 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -267,6 +329,7 @@
 				2133B44D1CA377950032DEF7 /* DetailViewController.m in Sources */,
 				214055F91CB360E3005B0DF6 /* SWTableViewController.m in Sources */,
 				21A9E20C1CA8039D004F7EB9 /* TableViewCell.m in Sources */,
+				21DA35B51CB6632800FDE643 /* Model.xcdatamodeld in Sources */,
 				21DA35B21CB6076700FDE643 /* SWTableViewModel+NSFetchedResultsController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -279,6 +342,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		21DA35B61CB6661800FDE643 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				21DA35C41CB66D2100FDE643 /* TableViewModelTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -286,6 +357,11 @@
 			isa = PBXTargetDependency;
 			target = 2133B43E1CA377950032DEF7 /* TableViewModel */;
 			targetProxy = 2133B45C1CA377950032DEF7 /* PBXContainerItemProxy */;
+		};
+		21DA35C01CB6661800FDE643 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2133B43E1CA377950032DEF7 /* TableViewModel */;
+			targetProxy = 21DA35BF1CB6661800FDE643 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -435,6 +511,30 @@
 			};
 			name = Release;
 		};
+		21DA35C21CB6661800FDE643 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = TableViewModelTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = SW.TableViewModelTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TableViewModel.app/TableViewModel";
+			};
+			name = Debug;
+		};
+		21DA35C31CB6661800FDE643 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = TableViewModelTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = SW.TableViewModelTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TableViewModel.app/TableViewModel";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -465,7 +565,28 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		21DA35C11CB6661800FDE643 /* Build configuration list for PBXNativeTarget "TableViewModelTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				21DA35C21CB6661800FDE643 /* Debug */,
+				21DA35C31CB6661800FDE643 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		21DA35B31CB6632800FDE643 /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				21DA35B41CB6632800FDE643 /* Model.xcdatamodel */,
+			);
+			currentVersion = 21DA35B41CB6632800FDE643 /* Model.xcdatamodel */;
+			path = Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 2133B4371CA377950032DEF7 /* Project object */;
 }

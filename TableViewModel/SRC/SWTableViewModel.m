@@ -41,7 +41,7 @@
 }
 
 - (void)setSections:(NSArray<SWTableSectionViewModel *> *)sections {
-    if (sections.count > 0) {
+    if (sections) {
         _sections = sections.mutableCopy;
     } else {
         _sections = [NSMutableArray new];
@@ -199,12 +199,10 @@ static void convertIndexPathsToIndexSets(NSArray* indexPaths, CFTypeRef* section
         NSUInteger section = element.section;
         NSCParameterAssert( section < count );
 
-        NSMutableIndexSet *__unsafe_unretained index;
         if ( !sectionBuffers[section] ) {
             sectionBuffers[section] = CFBridgingRetain([NSMutableIndexSet new]);
-            index = (__bridge NSMutableIndexSet *)(sectionBuffers[section]);
         }
-        [index addIndex:element.row];
+        [(__bridge NSMutableIndexSet *)(sectionBuffers[section]) addIndex:element.row];
     }
 }
 
@@ -228,6 +226,11 @@ static void convertIndexPathsToIndexSets(NSArray* indexPaths, CFTypeRef* section
     }
 }
 
+
+- (NSString *)description {
+    return [[NSString stringWithFormat:@"sections: %@", _sections]
+        stringByReplacingOccurrencesOfString:@"\\n" withString:@"\n"];
+}
 
 @end
 
@@ -310,5 +313,9 @@ static void convertIndexPathsToIndexSets(NSArray* indexPaths, CFTypeRef* section
 #pragma mark end rows
 #pragma mark -
 
+- (NSString *)description {
+    return [[NSString stringWithFormat:@"rows: %@", _rows]
+        stringByReplacingOccurrencesOfString:@"\\n" withString:@"\n"];
+}
 
 @end

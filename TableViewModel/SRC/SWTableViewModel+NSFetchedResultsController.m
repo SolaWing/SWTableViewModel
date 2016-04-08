@@ -8,6 +8,7 @@
 
 #import "SWTableViewModel+NSFetchedResultsController.h"
 #import <objc/runtime.h>
+#import <UIKit/UIKit.h>
 
 @implementation SWTableViewModel (NSFetchedResultsController)
 
@@ -165,6 +166,10 @@
 }
 
 - (void)updateWithPatchDictionary:(NSDictionary*)patchDictionary {
+    // patchDictionary may contains invalid section data.
+    // such as duplicate insert section and insert section objects
+    // so need to filter out these invalid indexPath
+
     SWFetchViewModelConvertor convertor = self.fetchConvertor;
     NSArray* updatedObjects = patchDictionary[UpdatedObjectsKey];
     if (updatedObjects) {
@@ -180,13 +185,18 @@
         [self replaceObjects:models atIndexPaths:indexPaths];
     }
 
+    NSIndexSet* deletedSections = patchDictionary[DeletedSectionKey];
     NSArray* deletedObjects = patchDictionary[DeletedObjectsKey];
     if (deletedObjects) {
-        NSArray* indexPaths = deletedObjects[1];
+        NSMutableArray* indexPaths = deletedObjects[1];
+        if (deletedSections) {
+            [indexPaths filterUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(NSIndexPath*  _Nonnull evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings){
+                return ![deletedSections containsIndex:evaluatedObject.section];
+            }]];
+        }
         [self removeObjectsAtIndexPaths:indexPaths];
     }
 
-    NSIndexSet* deletedSections = patchDictionary[DeletedSectionKey];
     if (deletedSections) {
         [self removeSectionsAtIndexes:deletedSections];
     }
@@ -200,16 +210,27 @@
 
     NSArray* insertObjects = patchDictionary[InsertObjectsKey];
     if (insertObjects) {
-        NSArray* models = insertObjects[0];
-        NSArray* indexPaths = insertObjects[1];
-        if (convertor) {
-            NSMutableArray* convertModels = [[NSMutableArray alloc] initWithCapacity:models.count];
-            for (id element in models){
-                [convertModels addObject:convertor(element)];
+        NSMutableArray* models = insertObjects[0];
+        NSMutableArray* indexPaths = insertObjects[1];
+        if (insertedSections) {
+            NSIndexSet* toRemove = [indexPaths indexesOfObjectsPassingTest:^BOOL(NSIndexPath*  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop){
+                return [insertedSections containsIndex:obj.section];
+            }];
+            if (toRemove.count > 0) {
+                [indexPaths removeObjectsAtIndexes:toRemove];
+                [models removeObjectsAtIndexes:toRemove];
             }
-            models = convertModels;
         }
-        [self insertObjects:models atIndexPaths:indexPaths];
+        if (indexPaths.count > 0) {
+            if (convertor) {
+                NSMutableArray* convertModels = [[NSMutableArray alloc] initWithCapacity:models.count];
+                for (id element in models){
+                    [convertModels addObject:convertor(element)];
+                }
+                models = convertModels;
+            }
+            [self insertObjects:models atIndexPaths:indexPaths];
+        }
     }
 }
 

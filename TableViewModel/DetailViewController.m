@@ -110,19 +110,23 @@
     return viewModel;
 }
 
+static NSUInteger counter = 0;
+
 - (void)updateSections {
     SWTableViewModel* model = _tableViewController.model;
     CGFloat random = arc4random() / (double)UINT32_MAX ;
     if (random > 6/8.0) {
         if (model.countOfSections == 0) { return; }
-        [self addRows];
+        [self updateRows];
     } else if (random > 2/4.0) {
+        self.navigationItem.title = [NSString stringWithFormat:@"rm sec %lu", ++counter];
         if (model.countOfSections == 0) { return; }
         NSMutableIndexSet* indexes = [NSMutableIndexSet indexSetWithIndex:0];
         [indexes addIndex:model.countOfSections-1];
         [model removeSectionsAtIndexes:indexes];
     } else if (random > 1/4.0) {
         // insert
+        self.navigationItem.title = [NSString stringWithFormat:@"ins sec %lu", ++counter];
         [model insertSections:@[
             [SWTableSectionViewModel newWithRows:@[
                 @{@"text": @"insert 1 section 0"},
@@ -145,7 +149,8 @@
                 @"backgroundColor":[UIColor greenColor],
             } footer:@"footer 2"],
         ] atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0,2)]];
-    } else if (model.countOfSections < 2) {
+    } else if (model.countOfSections < 4) {
+        self.navigationItem.title = [NSString stringWithFormat:@"reload sec %lu", ++counter];
         model.sections = [SWTableSectionViewModel arrayOfSectionsRows:@[
         // _tableViewController.model = [SWTableViewModel newWithSectionRows:@[
             @[
@@ -164,6 +169,7 @@
         _tableViewController.model.delegate = self;
     } else {
          // replace
+        self.navigationItem.title = [NSString stringWithFormat:@"chg sec %lu", ++counter];
         [model replaceObjectInSectionsAtIndex:1 withObject:[SWTableSectionViewModel newWithRows:@[
             @{@"text": @"replace section 0"},
             @{@"text": @"replace section 1"},
@@ -179,13 +185,17 @@
             inRowsAtIndex:[section countOfRows]/2];
 }
 
-- (void)addRows {
+- (void)updateRows {
     CGFloat random = arc4random() / (double)UINT32_MAX ;
     if (random > 2/4.0) {
+        self.navigationItem.title = [NSString stringWithFormat:@"rm rows %lu", ++counter];
         return [self deleteRows];
     } else if (random > 1/4.0) {
+        self.navigationItem.title = [NSString stringWithFormat:@"chg rows %lu", ++counter];
         return [self replaceRows];
     }
+
+    self.navigationItem.title = [NSString stringWithFormat:@"ins rows %lu", ++counter];
     SWTableSectionViewModel* section = [_tableViewController.model objectInSectionsAtIndex:0];
     id desc = [NSDate date];
     [section insertRows:@[

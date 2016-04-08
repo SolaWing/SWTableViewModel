@@ -101,6 +101,7 @@
     // float section footer may move to bottom when partially update tableView
     if (context == @"sections") {
         NSParameterAssert([NSThread isMainThread]);
+        NSParameterAssert(self.tableView);
         // deal section KVO change
         NSArray* oldSections = change[NSKeyValueChangeOldKey];
         NSArray* newSections = change[NSKeyValueChangeNewKey];
@@ -126,6 +127,7 @@
                 NSIndexSet* indexes = change[NSKeyValueChangeIndexesKey];
                 void(*imp)(UITableView*, SEL, NSIndexSet*, UITableViewRowAnimation)
                     = (void*)[self.tableView methodForSelector:updateSEL];
+                NSParameterAssert(imp); // clean analyze warning
                 imp(self.tableView, updateSEL, indexes, UITableViewRowAnimationAutomatic);
             } return;
             case NSKeyValueChangeSetting: {
@@ -155,6 +157,7 @@
                 }];
                 void (*imp)(UITableView*, SEL, NSArray*, UITableViewRowAnimation)
                     = (void*)[self.tableView methodForSelector:updateSEL];
+                NSParameterAssert(imp);
                 imp(self.tableView, updateSEL, indexPaths, UITableViewRowAnimationAutomatic);
             } return;
             case NSKeyValueChangeSetting: {
