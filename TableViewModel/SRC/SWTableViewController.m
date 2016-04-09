@@ -22,7 +22,6 @@
     return self;
 }
 
-#pragma mark - property
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     if (_clearsSelectionOnViewWillAppear) {
@@ -34,6 +33,11 @@
             }
         }
     }
+}
+
+#pragma mark - property
+static inline bool isSyncing(SWTableViewSyncStyle style) {
+    return style > 0;
 }
 
 - (void)loadView {
@@ -58,26 +62,25 @@
 
 - (void)setModel:(SWTableViewModel *)model {
     if (_model != model) {
-        if (_model && _syncing) {
+        if (_model && isSyncing(_syncStyle)) {
             [self unbindModel:_model];
         }
         _model = model;
         [self.tableView reloadData];
-        if (_model && _syncing) {
+        if (_model && isSyncing(_syncStyle)) {
             [self bindModel:_model];
         }
     }
 }
 
-- (void)setSyncing:(bool)syncing {
-    if (_syncing != syncing) {
-        _syncing = syncing;
-        if (_model) {
-            if (_syncing) {
-                [self bindModel:_model];
-            } else {
-                [self unbindModel:_model];
-            }
+- (void)setSyncStyle:(SWTableViewSyncStyle)syncStyle {
+    bool changeSync = (isSyncing(_syncStyle) != isSyncing(syncStyle));
+    _syncStyle = syncStyle;
+    if (_model && changeSync) {
+        if (isSyncing(_syncStyle)) {
+            [self bindModel:_model];
+        } else {
+            [self unbindModel:_model];
         }
     }
 }
@@ -111,6 +114,12 @@
             [element addObserver:self forKeyPath:@"rows" options:0 context:@"rows"];
         }
 
+        if (_syncStyle == SWTableViewSyncStyleReload) {
+            [self.tableView reloadData];
+            return;
+        }
+
+        // PartialUpdateSection
         NSKeyValueChange kind = [change[NSKeyValueChangeKindKey] integerValue];
         SEL updateSEL;
         switch( kind ){
@@ -135,7 +144,12 @@
         } return;
     } else if (context == @"rows") {
         NSParameterAssert([NSThread isMainThread]);
+        if (_syncStyle == SWTableViewSyncStyleReload) {
+            [self.tableView reloadData];
+            return;
+        }
 
+        // PartialUpdate
         NSKeyValueChange kind = [change[NSKeyValueChangeKindKey] integerValue];
         NSUInteger section = [_model indexOfObjectInSections:object];
         SEL updateSEL;
@@ -168,8 +182,15 @@
     [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
-- (id<SWCellFactory>)cellFactory {
+- (id<SWCellFactory>)defaultCellFactory {
     return [SWCellFactory defaultFactory];
+}
+
+- (id<SWCellFactory>)cellFactory {
+    if (nil == _cellFactory) {
+        return [self defaultCellFactory];
+    }
+    return _cellFactory;
 }
 
 - (id)modelForRowAtModelIndexPath:(NSIndexPath *)indexPath {

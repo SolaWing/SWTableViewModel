@@ -9,6 +9,7 @@
 #import <XCTest/XCTest.h>
 #import <CoreData/CoreData.h>
 #import "SWTableViewModel+NSFetchedResultsController.h"
+#import "SWTableViewController.h"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -211,6 +212,34 @@
         XCTAssertEqualObjects(section.header, [obj name]);
         XCTAssertEqualObjects(section.rows, [[obj objects] valueForKey:@"name"]);
     }];
+}
+
+- (void)testSyncBind {
+    // reloadData in ios9 should have only reload when update view
+    SWTableViewController* controller = [[SWTableViewController alloc] init];
+    UIWindow* window = [UIApplication sharedApplication].keyWindow;
+
+    [window addSubview:controller.view];
+    controller.view.frame = window.bounds;
+
+    controller.model = [SWTableViewModel newWithSectionRows:@[
+        @[@"array 1", @"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1"],
+        @[@"array 2", @"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2"],
+        @[@"array 3", @"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3"],
+    ]];
+
+    controller.view.backgroundColor = [UIColor redColor];
+
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1]];
+
+    controller.syncStyle = SWTableViewSyncStyleReload;
+    [controller.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:2 inSection:2] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+    for (int i = 0; i < 100; ++i) {
+        [controller.model.sections[2] replaceObjectInRowsAtIndex:2 withObject:@"replace 1"];
+    }
+    //        [controller.model removeObjectFromSectionsAtIndex:1];
+
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:2]];
 }
 
 //- (void)testPerformanceExample {

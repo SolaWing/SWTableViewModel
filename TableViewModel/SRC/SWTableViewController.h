@@ -12,17 +12,26 @@
 #import "SWCellFactory.h"
 #import "SWCellDecoratorProtocol.h"
 
+typedef NS_ENUM(NSInteger, SWTableViewSyncStyle) {
+    SWTableViewSyncStyleNone = 0, // do nothing when model change
+    SWTableViewSyncStylePartialUpdate = 1, // call partial update methods
+    SWTableViewSyncStyleReload = 2, // call reload methods
+};
+
 /** this controller use to display a static tableView, and don't provide edit feature
  * you may subclass to add feature or customize behaviour */
 @interface SWTableViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
 /** the viewModel used by tableView. when set to new model, call reloadData */
 @property (nonatomic, strong) SWTableViewModel* model;
-/** if YES, will observe changes in model and refresh tableView */
-@property (nonatomic) bool syncing;
+/** behaviour when model change. */
+@property (nonatomic) SWTableViewSyncStyle syncStyle;
 
 /** this class use self.view as tableView, subclass may implement loadView, getter, setter. */
 @property (nonatomic, strong) UITableView* tableView;
+
+/** cell factory to use, default use default SWCellFactory */
+@property (nonatomic, strong) id<SWCellFactory> cellFactory;
 
 /** decorator used to additional config for cell */
 @property (nonatomic, strong) id<SWCellDecorator> cellDecorator;
@@ -33,7 +42,7 @@
 /** return model in SWTableViewModel at indexPath */
 - (id)modelForRowAtModelIndexPath:(NSIndexPath *)indexPath;
 
-#pragma mark - subclass method
-/** use default SWCellFactory. subclass can choose to use a different one */
-- (id<SWCellFactory>)cellFactory;
+#pragma mark - subclass to override
+/** default cellFactory to use when not set cellFactory */
+- (id<SWCellFactory>)defaultCellFactory;
 @end

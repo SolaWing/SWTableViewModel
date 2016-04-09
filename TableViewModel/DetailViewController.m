@@ -37,7 +37,7 @@
     // _tableViewController.tableView.allowsMultipleSelectionDuringEditing = YES;
     _tableViewController.model = [self testViewModel];
 
-    _tableViewController.syncing = YES;
+    _tableViewController.syncStyle = SWTableViewSyncStylePartialUpdate;
     self.navigationItem.rightBarButtonItems = @[
         [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
             target:self action:@selector(updateSections)],
