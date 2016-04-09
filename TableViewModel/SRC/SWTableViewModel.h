@@ -36,6 +36,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeRowsAtIndexes:(NSIndexSet *)indexes;
 - (void)replaceObjectInRowsAtIndex:(NSUInteger)index withObject:(id)object;
 - (void)replaceRowsAtIndexes:(NSIndexSet *)indexes withRows:(NSArray *)array;
+
+- (void)addObjectInRows:(id)object;
+- (void)addRowsFromArray:(NSArray *)array;
 #pragma mark end rows
 #pragma mark -
 
@@ -77,6 +80,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeSectionsAtIndexes:(NSIndexSet *)indexes;
 - (void)replaceObjectInSectionsAtIndex:(NSUInteger)index withObject:(SWTableSectionViewModel*)object;
 - (void)replaceSectionsAtIndexes:(NSIndexSet *)indexes withSections:(NSArray *)array;
+
+- (void)addObjectInSections:(SWTableSectionViewModel *)object;
+- (void)addSectionsFromArray:(NSArray *)array;
 
 /** following methods as the indexPaths version of modify underlying models.
  * the indexPath section should valid, and row will be batch packed in NSIndexSet */

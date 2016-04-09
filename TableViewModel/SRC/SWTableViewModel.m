@@ -120,6 +120,15 @@
     [_sections replaceObjectsAtIndexes:indexes withObjects:array];
 }
 
+
+- (void)addObjectInSections:(SWTableSectionViewModel *)object {
+    [self insertObject:object inSectionsAtIndex:_sections.count];
+}
+
+- (void)addSectionsFromArray:(NSArray *)array {
+    [self insertSections:array atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange( _sections.count, array.count )]];
+}
+
 #pragma mark end sections
 
 #pragma mark - indexPaths version of modify models
@@ -308,6 +317,14 @@ static void convertIndexPathsToIndexSets(NSArray* indexPaths, CFTypeRef* section
 
 - (void)replaceRowsAtIndexes:(NSIndexSet *)indexes withRows:(NSArray *)array {
     [_rows replaceObjectsAtIndexes:indexes withObjects:array];
+}
+
+- (void)addObjectInRows:(id)object {
+    [self insertObject:object inRowsAtIndex:_rows.count];
+}
+
+- (void)addRowsFromArray:(NSArray *)array {
+    [self insertRows:array atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange( _rows.count, array.count )]];
 }
 
 #pragma mark end rows
