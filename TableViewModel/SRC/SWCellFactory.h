@@ -16,7 +16,7 @@
 - (void)loadModel:(id)model;
 
 @optional
-+ (CGFloat)heightForModel:(id)model;
++ (CGFloat)heightForModel:(id)model withWidth:(CGFloat)width;
 
 @end
 

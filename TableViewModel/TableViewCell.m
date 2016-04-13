@@ -36,7 +36,7 @@
 }
 
 - (void)loadModel:(id)model {};
-+ (CGFloat)heightForModel:(id)model { return 3; }
++ (CGFloat)heightForModel:(id)model withWidth:(CGFloat)width { return 3; }
 
 @end
 

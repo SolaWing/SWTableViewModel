@@ -30,8 +30,9 @@
     Class cellClass = [self cellClassForModel:model];
     NSParameterAssert(cellClass);
 
-    if ([cellClass respondsToSelector:@selector(heightForModel:)]) {
-        return [cellClass heightForModel:model];
+    if ([cellClass respondsToSelector:@selector(heightForModel:withWidth:)]) {
+        CGFloat width = tableView.bounds.size.width;
+        return [cellClass heightForModel:model withWidth:width];
     }
 
     return tableView.rowHeight;
@@ -52,9 +53,9 @@
     return cell;
 }
 
-static CGFloat heightForSection(Class cls, id model) {
-    if ([cls respondsToSelector:@selector(heightForModel:)]) {
-        return [cls heightForModel:model];
+static CGFloat heightForSection(Class cls, id model, CGFloat width) {
+    if ([cls respondsToSelector:@selector(heightForModel:withWidth:)]) {
+        return [cls heightForModel:model withWidth:width];
     }
 
     return kDefaultSectionHeight;
@@ -70,7 +71,7 @@ static UIView* getSectionView(UITableView* tableView, Class cls, id model) {
         }
     } else {
         CGRect frame = tableView.bounds;
-        frame.size.height = heightForSection(cls, model);
+        frame.size.height = heightForSection(cls, model, frame.size.width);
         v = [[cls alloc] initWithFrame:frame];
     }
 
@@ -81,7 +82,7 @@ static UIView* getSectionView(UITableView* tableView, Class cls, id model) {
 - (CGFloat)heightForSectionHeaderInTableView:(UITableView *)tableView model:(id)model {
     Class cls = [self headerClassForModel:model];
     if (!cls) { return 0; }
-    return heightForSection(cls, model);
+    return heightForSection(cls, model, tableView.bounds.size.width);
 }
 
 - (UIView *)sectionHeaderForTableView:(UITableView *)tableView model:(id)model {
@@ -94,7 +95,7 @@ static UIView* getSectionView(UITableView* tableView, Class cls, id model) {
 - (CGFloat)heightForSectionFooterInTableView:(UITableView *)tableView model:(id)model {
     Class cls = [self footerClassForModel:model];
     if (!cls) { return 0; }
-    return heightForSection(cls, model);
+    return heightForSection(cls, model, tableView.bounds.size.width);
 }
 
 - (UIView *)sectionFooterForTableView:(UITableView *)tableView model:(id)model {
