@@ -55,8 +55,15 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)newWithSectionRows:(nullable NSArray*)sections;
 
 @property (nonatomic, weak, nullable) id<SWTableViewModelDelegate> delegate;
+
 /** if need to change section, use KVC mutable array api */
 @property (nonatomic, copy) NSArray<SWTableSectionViewModel*>* sections;
+
+/** a flag to indicate updating source, view use it for batch update */
+@property (nonatomic, readonly, getter=isUpdating) BOOL updating;
+/** the update order should coincide with view update, specifically
+ * replaceObjects, delete objects, delete section, insert section, insert objects */
+- (void)batchUpdates:(dispatch_block_t)updateBlock;
 
 /** NOTE will raise exception for invalid indexPath */
 - (id)modelAtIndexPath:(NSIndexPath*)indexPath;

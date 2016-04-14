@@ -152,6 +152,8 @@
     // move operation like a remove and insert.
     NSMutableDictionary *fetchChangedObjects = self.fetchChangedObjects;
     self.fetchChangedObjects = nil;
+    if (fetchChangedObjects.count == 0) { return; }
+
     NSIndexSet* insertSection = fetchChangedObjects[InsertSectionKey];
     if (insertSection) {
         fetchChangedObjects[InsertSectionInfoKey] =
@@ -169,7 +171,7 @@
     // patchDictionary may contains invalid section data.
     // such as duplicate insert section and insert section objects
     // so need to filter out these invalid indexPath
-
+  [self batchUpdates:^(void){
     SWFetchViewModelConvertor convertor = self.fetchConvertor;
     NSArray* updatedObjects = patchDictionary[UpdatedObjectsKey];
     if (updatedObjects) {
@@ -232,6 +234,7 @@
             [self insertObjects:models atIndexPaths:indexPaths];
         }
     }
+  }];
 }
 
 @end

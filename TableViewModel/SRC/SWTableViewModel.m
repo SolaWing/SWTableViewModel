@@ -48,6 +48,18 @@
     }
 }
 
+- (void)setUpdating:(BOOL)updating { _updating = updating; }
+
+- (void)batchUpdates:(dispatch_block_t)updateBlock {
+    bool isUpdating = _updating;
+    if (!isUpdating) {
+        self.updating = YES;
+    }
+    updateBlock();
+    if (!isUpdating) {
+        self.updating = NO;
+    }
+}
 - (id)modelAtIndexPath:(NSIndexPath *)indexPath {
     return [[self objectInSectionsAtIndex:indexPath.section] objectInRowsAtIndex:indexPath.row];
 }

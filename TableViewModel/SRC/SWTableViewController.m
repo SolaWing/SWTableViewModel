@@ -86,6 +86,9 @@ static inline bool isSyncing(SWTableViewSyncStyle style) {
 }
 
 - (void)bindModel:(SWTableViewModel*)model {
+    [model addObserver:self forKeyPath:@"updating" options:NSKeyValueObservingOptionOld context:@"updating"];
+    if (model.updating) { [self beginUpdates]; } // sync updating stat
+
     [model addObserver:self forKeyPath:@"sections" options:NSKeyValueObservingOptionOld|NSKeyValueObservingOptionNew context:@"sections"];
     for (SWTableSectionViewModel* element in model.sections){
         [element addObserver:self forKeyPath:@"rows" options:0 context:@"rows"];
@@ -97,16 +100,34 @@ static inline bool isSyncing(SWTableViewSyncStyle style) {
         [element removeObserver:self forKeyPath:@"rows" context:@"rows"];
     }
     [model removeObserver:self forKeyPath:@"sections" context:@"sections"];
+    
+    [model removeObserver:self forKeyPath:@"updating" context:@"updating"];
+    if (model.updating) { [self endUpdates]; } // end sync updating stat
 }
 
 static inline bool shouldReloadTableView(SWTableViewController* self) {
-    // tableView reload should really work when layout. so when not visible,
-    // multi call to reload should efficient and can avoid some partial update bugs
-    return self->_syncStyle == SWTableViewSyncStyleReload || self.tableView.hidden || !self.tableView.window;
+    // NOTE: return value shouldn't change during batchUpdates
+    return self->_syncStyle == SWTableViewSyncStyleReload;
+}
+
+- (void)beginUpdates {
+    if ( !shouldReloadTableView(self) ) {
+        [self.tableView beginUpdates];
+    }
+}
+
+- (void)endUpdates {
+    if ( shouldReloadTableView(self) ) {
+        [self.tableView reloadData];
+    } else {
+        [self.tableView endUpdates];
+    }
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
-    // float section footer may move to bottom when partially update tableView
+    // BUGS: float section footer may move to bottom when partially update tableView
+    // NOTE: when not batch update, delete rows may cause contentSize and offset change.
+    //       that's why use batch update. performance is also one factor.
     if (context == @"sections") {
         NSParameterAssert([NSThread isMainThread]);
         NSParameterAssert(self.tableView);
@@ -121,7 +142,9 @@ static inline bool shouldReloadTableView(SWTableViewController* self) {
         }
 
         if ( shouldReloadTableView(self) ) {
-            [self.tableView reloadData];
+            if (!_model.updating) { // delay reloadData to endUpdating
+                [self.tableView reloadData];
+            }
             return;
         }
 
@@ -145,13 +168,16 @@ static inline bool shouldReloadTableView(SWTableViewController* self) {
                 imp(self.tableView, updateSEL, indexes, UITableViewRowAnimationAutomatic);
             } return;
             case NSKeyValueChangeSetting: {
+                NSAssert( !_model.updating, @"shouldn't replace entire sections when batch updating!" );
                 [self.tableView reloadData];
             } return;
         } return;
     } else if (context == @"rows") {
         NSParameterAssert([NSThread isMainThread]);
         if ( shouldReloadTableView(self) ) {
-            [self.tableView reloadData];
+            if (!_model.updating) { // delay reloadData to endUpdating
+                [self.tableView reloadData];
+            }
             return;
         }
 
@@ -183,6 +209,18 @@ static inline bool shouldReloadTableView(SWTableViewController* self) {
                 [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:section]
                               withRowAnimation:UITableViewRowAnimationAutomatic];
             } return;
+        } return;
+    } else if (context == @"updating") {
+        BOOL oldValue = [change[NSKeyValueChangeOldKey] boolValue];
+        BOOL newValue = _model.updating;
+        if (oldValue != newValue) {
+            // when reloadSync Style, reload when endUpdating
+            // when PartialUpdate Style, call beginUpdates and endUpdates
+            if (newValue) {
+                [self beginUpdates];
+            } else {
+                [self endUpdates];
+            }
         } return;
     }
     [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];

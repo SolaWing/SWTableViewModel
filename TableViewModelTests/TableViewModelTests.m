@@ -229,15 +229,18 @@
     ]];
 
     controller.view.backgroundColor = [UIColor redColor];
+    [controller.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:2 inSection:2] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
 
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1]];
 
-    controller.syncStyle = SWTableViewSyncStyleReload;
-    [controller.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:2 inSection:2] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
-    for (int i = 0; i < 100; ++i) {
-        [controller.model.sections[2] replaceObjectInRowsAtIndex:2 withObject:@"replace 1"];
-    }
-    //        [controller.model removeObjectFromSectionsAtIndex:1];
+    controller.syncStyle = SWTableViewSyncStylePartialUpdate;
+    [controller.model batchUpdates:^{
+        for (int i = 0; i < 100; ++i) {
+            [controller.model.sections[2] replaceObjectInRowsAtIndex:2 withObject:@"replace 1"];
+        }
+        [controller.model.sections[2] removeObjectFromRowsAtIndex:3];
+        [controller.model removeObjectFromSectionsAtIndex:1];
+    }];
 
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:2]];
 }
