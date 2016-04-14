@@ -99,6 +99,12 @@ static inline bool isSyncing(SWTableViewSyncStyle style) {
     [model removeObserver:self forKeyPath:@"sections" context:@"sections"];
 }
 
+static inline bool shouldReloadTableView(SWTableViewController* self) {
+    // tableView reload should really work when layout. so when not visible,
+    // multi call to reload should efficient and can avoid some partial update bugs
+    return self->_syncStyle == SWTableViewSyncStyleReload || self.tableView.hidden || !self.tableView.window;
+}
+
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
     // float section footer may move to bottom when partially update tableView
     if (context == @"sections") {
@@ -114,7 +120,7 @@ static inline bool isSyncing(SWTableViewSyncStyle style) {
             [element addObserver:self forKeyPath:@"rows" options:0 context:@"rows"];
         }
 
-        if (_syncStyle == SWTableViewSyncStyleReload) {
+        if ( shouldReloadTableView(self) ) {
             [self.tableView reloadData];
             return;
         }
@@ -144,7 +150,7 @@ static inline bool isSyncing(SWTableViewSyncStyle style) {
         } return;
     } else if (context == @"rows") {
         NSParameterAssert([NSThread isMainThread]);
-        if (_syncStyle == SWTableViewSyncStyleReload) {
+        if ( shouldReloadTableView(self) ) {
             [self.tableView reloadData];
             return;
         }
