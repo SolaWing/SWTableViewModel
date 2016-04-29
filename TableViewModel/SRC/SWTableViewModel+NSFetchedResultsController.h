@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef __nonnull id(^SWFetchViewModelConvertor)(id obj);
+typedef id __nonnull (^SWFetchViewModelConvertor)(id obj);
 
 /** this category implement NSFetchedResultsControllerDelegate for convert and
  * bind NSFetchedResultsController source to SWTableViewModel */
@@ -19,7 +19,7 @@ typedef __nonnull id(^SWFetchViewModelConvertor)(id obj);
 
 /** create a SWTableViewModel through NSFetchedResultsController. use it's fetchedObjects, set as it's delegate to observe change
  * and may possible a convertor to convert object before put in tableViewModel */
-+ (instancetype)newWithFetchResultsController:(NSFetchedResultsController*)controller andConvertor:(SWFetchViewModelConvertor __nullable)convertor;
++ (instancetype)newWithFetchResultsController:(NSFetchedResultsController*)controller andConvertor:(nullable SWFetchViewModelConvertor)convertor;
 
 @property (nonatomic, copy, nullable) SWFetchViewModelConvertor fetchConvertor;
 

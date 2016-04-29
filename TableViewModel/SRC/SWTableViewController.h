@@ -24,7 +24,10 @@ typedef NS_ENUM(NSInteger, SWTableViewSyncStyle) {
 
 /** the viewModel used by tableView. when set to new model, call reloadData */
 @property (nonatomic, strong) SWTableViewModel* model;
-/** behaviour when model change. */
+
+/** behaviour when model change.
+ * NOTE: shouldn't change value when model is updating!
+ */
 @property (nonatomic) SWTableViewSyncStyle syncStyle;
 
 /** this class use self.view as tableView, subclass may implement loadView, getter, setter. */

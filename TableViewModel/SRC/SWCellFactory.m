@@ -7,6 +7,7 @@
 //
 
 #import "SWCellFactory.h"
+#import <objc/runtime.h>
 
 #define kDefaultSectionHeight 22
 
@@ -23,8 +24,15 @@
     return instance;
 }
 
-- (Class)headerClassForModel:(id)model { return nil; }
-- (Class)footerClassForModel:(id)model { return nil; }
+static Class defaultHeaderFooterClassForModel(id self, SEL _cmd, id model) { return nil; }
+
++ (void)initialize {
+    if (self == [SWCellFactory class]) {
+        // fix category override warning, and provide default return nil imp
+        class_addMethod(self, @selector(headerClassForModel:), (IMP)defaultHeaderFooterClassForModel, "#@:@" );
+        class_addMethod(self, @selector(footerClassForModel:), (IMP)defaultHeaderFooterClassForModel, "#@:@" );
+    }
+}
 
 - (CGFloat)heightForTableView:(UITableView *)tableView model:(id)model {
     Class cellClass = [self cellClassForModel:model];
