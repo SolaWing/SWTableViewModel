@@ -19,6 +19,7 @@
 		214055F91CB360E3005B0DF6 /* SWTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 214055F41CB360E3005B0DF6 /* SWTableViewController.m */; };
 		214055FA1CB360E3005B0DF6 /* SWTableViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 214055F71CB360E3005B0DF6 /* SWTableViewModel.m */; };
 		214056061CB3BEA6005B0DF6 /* SWCellDecorator.m in Sources */ = {isa = PBXBuildFile; fileRef = 214056051CB3BEA6005B0DF6 /* SWCellDecorator.m */; };
+		2195AAAB1D59685C00A00CEC /* SWTableViewBinder.m in Sources */ = {isa = PBXBuildFile; fileRef = 2195AAAA1D59685C00A00CEC /* SWTableViewBinder.m */; };
 		21A9E20C1CA8039D004F7EB9 /* TableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 21A9E20B1CA8039D004F7EB9 /* TableViewCell.m */; };
 		21DA35B21CB6076700FDE643 /* SWTableViewModel+NSFetchedResultsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21DA35B11CB6076700FDE643 /* SWTableViewModel+NSFetchedResultsController.m */; };
 		21DA35B51CB6632800FDE643 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 21DA35B31CB6632800FDE643 /* Model.xcdatamodeld */; };
@@ -65,9 +66,11 @@
 		214055F51CB360E3005B0DF6 /* SWTableViewModel+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SWTableViewModel+Private.h"; sourceTree = "<group>"; };
 		214055F61CB360E3005B0DF6 /* SWTableViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWTableViewModel.h; sourceTree = "<group>"; };
 		214055F71CB360E3005B0DF6 /* SWTableViewModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWTableViewModel.m; sourceTree = "<group>"; };
-		214056011CB3B637005B0DF6 /* SWCellDecoratorProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWCellDecoratorProtocol.h; sourceTree = "<group>"; };
+		214056011CB3B637005B0DF6 /* SWTableViewHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWTableViewHeader.h; sourceTree = "<group>"; };
 		214056041CB3BEA6005B0DF6 /* SWCellDecorator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWCellDecorator.h; sourceTree = "<group>"; };
 		214056051CB3BEA6005B0DF6 /* SWCellDecorator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWCellDecorator.m; sourceTree = "<group>"; };
+		2195AAA91D59685C00A00CEC /* SWTableViewBinder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWTableViewBinder.h; sourceTree = "<group>"; };
+		2195AAAA1D59685C00A00CEC /* SWTableViewBinder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWTableViewBinder.m; sourceTree = "<group>"; };
 		21A9E20A1CA8039D004F7EB9 /* TableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TableViewCell.h; sourceTree = "<group>"; };
 		21A9E20B1CA8039D004F7EB9 /* TableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TableViewCell.m; sourceTree = "<group>"; };
 		21DA35B01CB6076700FDE643 /* SWTableViewModel+NSFetchedResultsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SWTableViewModel+NSFetchedResultsController.h"; sourceTree = "<group>"; };
@@ -174,9 +177,11 @@
 				214055F51CB360E3005B0DF6 /* SWTableViewModel+Private.h */,
 				214055F61CB360E3005B0DF6 /* SWTableViewModel.h */,
 				214055F71CB360E3005B0DF6 /* SWTableViewModel.m */,
-				214056011CB3B637005B0DF6 /* SWCellDecoratorProtocol.h */,
+				214056011CB3B637005B0DF6 /* SWTableViewHeader.h */,
 				21DA35B01CB6076700FDE643 /* SWTableViewModel+NSFetchedResultsController.h */,
 				21DA35B11CB6076700FDE643 /* SWTableViewModel+NSFetchedResultsController.m */,
+				2195AAA91D59685C00A00CEC /* SWTableViewBinder.h */,
+				2195AAAA1D59685C00A00CEC /* SWTableViewBinder.m */,
 			);
 			path = SRC;
 			sourceTree = "<group>";
@@ -327,6 +332,7 @@
 				214055FA1CB360E3005B0DF6 /* SWTableViewModel.m in Sources */,
 				2133B4441CA377950032DEF7 /* main.m in Sources */,
 				2133B44D1CA377950032DEF7 /* DetailViewController.m in Sources */,
+				2195AAAB1D59685C00A00CEC /* SWTableViewBinder.m in Sources */,
 				214055F91CB360E3005B0DF6 /* SWTableViewController.m in Sources */,
 				21A9E20C1CA8039D004F7EB9 /* TableViewCell.m in Sources */,
 				21DA35B51CB6632800FDE643 /* Model.xcdatamodeld in Sources */,
@@ -572,6 +578,7 @@
 				21DA35C31CB6661800FDE643 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 

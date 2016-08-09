@@ -10,6 +10,7 @@
 #import <CoreData/CoreData.h>
 #import "SWTableViewModel+NSFetchedResultsController.h"
 #import "SWTableViewController.h"
+#import "SWTableViewBinder.h"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -214,7 +215,7 @@
     }];
 }
 
-- (void)testSyncBind {
+- (void)testSyncController {
     // reloadData in ios9 should have only reload when update view
     SWTableViewController* controller = [[SWTableViewController alloc] init];
     UIWindow* window = [UIApplication sharedApplication].keyWindow;
@@ -240,6 +241,37 @@
         }
         [controller.model.sections[2] removeObjectFromRowsAtIndex:3];
         [controller.model removeObjectFromSectionsAtIndex:1];
+    }];
+
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:2]];
+}
+
+- (void)testSyncBinder {
+    // reloadData in ios9 should have only reload when update view
+    UIWindow* window = [UIApplication sharedApplication].keyWindow;
+    UITableView* tableView = [UITableView new];
+
+    [window addSubview:tableView];
+    tableView.frame = window.bounds;
+
+    tableView.bindModel = [SWTableViewModel newWithSectionRows:@[
+        @[@"array 1", @"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1",@"array 1"],
+        @[@"array 2", @"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2",@"array 2"],
+        @[@"array 3", @"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3",@"array 3"],
+    ]];
+
+    tableView.backgroundColor = [UIColor redColor];
+    [tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:2 inSection:2] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1]];
+
+    tableView.bindSyncStyle = SWTableViewSyncStylePartialUpdate;
+    [tableView.bindModel batchUpdates:^{
+        for (int i = 0; i < 100; ++i) {
+            [tableView.bindModel.sections[2] replaceObjectInRowsAtIndex:2 withObject:@"replace 1"];
+        }
+        [tableView.bindModel.sections[2] removeObjectFromRowsAtIndex:3];
+        [tableView.bindModel removeObjectFromSectionsAtIndex:1];
     }];
 
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:2]];

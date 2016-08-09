@@ -9,6 +9,12 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+typedef NS_ENUM(NSInteger, SWTableViewSyncStyle) {
+    SWTableViewSyncStyleNone = 0, // do nothing when model change
+    SWTableViewSyncStylePartialUpdate = 1, // call partial update methods
+    SWTableViewSyncStyleReload = 2, // call reload methods
+};
+
 /** object use to decorate cell, such as add a separator line */
 @protocol SWCellDecorator <NSObject>
 
@@ -19,3 +25,4 @@
 - (void)tableView:(UITableView*)tableView decorateCell:(UITableViewCell*)cell forModel:(id)model atIndexPath:(NSIndexPath*)indexPath;
 
 @end
+

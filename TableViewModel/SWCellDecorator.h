@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SWCellDecoratorProtocol.h"
+#import "SWTableViewHeader.h"
 
 @interface SWCellHeadSeperatorLineDecorator : NSObject <SWCellDecorator>
 

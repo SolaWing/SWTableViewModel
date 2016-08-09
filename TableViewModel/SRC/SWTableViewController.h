@@ -10,13 +10,7 @@
 #import <UIKit/UIKit.h>
 #import "SWTableViewModel.h"
 #import "SWCellFactory.h"
-#import "SWCellDecoratorProtocol.h"
-
-typedef NS_ENUM(NSInteger, SWTableViewSyncStyle) {
-    SWTableViewSyncStyleNone = 0, // do nothing when model change
-    SWTableViewSyncStylePartialUpdate = 1, // call partial update methods
-    SWTableViewSyncStyleReload = 2, // call reload methods
-};
+#import "SWTableViewHeader.h"
 
 /** this controller use to display a static tableView, and don't provide edit feature
  * you may subclass to add feature or customize behaviour */

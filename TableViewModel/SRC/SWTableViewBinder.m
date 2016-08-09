@@ -1,38 +1,38 @@
 //
-//  SWTableViewController.m
+//  SWTableViewBinder.m
 //  TableViewModel
 //
-//  Created by SolaWing on 16/3/25.
+//  Created by SolaWing on 16/8/9.
 //  Copyright © 2016年 SW. All rights reserved.
 //
 
-#import "SWTableViewController.h"
+#import "SWTableViewBinder.h"
 #import <objc/runtime.h>
 
-@implementation SWTableViewController
+#define STRONGIFY_TABLEVIEW_OR_RETURN() \
+    UITableView* tableView = self.tableView; if (!tableView) { return; }
+
+@implementation SWTableViewBinder
 
 - (void)dealloc {
     self.model = nil; // release KVO
 }
 
-- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
-        _clearsSelectionOnViewWillAppear = YES;
+- (instancetype)init { NSAssert(false, @"shouldn't call this method!"); return [self initWithTableView:nil]; }
+- (instancetype)initWithTableView:(UITableView *)tableView {
+    if (self = [super init]) {
+        _tableView = tableView;
+        _tableView.delegate = self;
+        _tableView.dataSource = self;
     }
     return self;
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    if (_clearsSelectionOnViewWillAppear) {
-        UITableView* tableView = self.tableView;
-        NSArray* indexPaths = [tableView indexPathsForSelectedRows];
-        if (indexPaths.count > 0) {
-            for (NSIndexPath* element in indexPaths){
-                [tableView deselectRowAtIndexPath:element animated:YES];
-            }
-        }
+- (instancetype)initWithTableView:(UITableView *)tableView model:(SWTableViewModel *)model {
+    if (self = [self initWithTableView:tableView]) {
+        self.model = model;
     }
+    return self;
 }
 
 #pragma mark - property
@@ -40,33 +40,14 @@ static inline bool isSyncing(SWTableViewSyncStyle style) {
     return style > 0;
 }
 
-- (void)loadView {
-    self.tableView = [[UITableView alloc] initWithFrame:[UIScreen mainScreen].bounds
-                                                  style:UITableViewStylePlain];
-}
-
-- (UITableView *)tableView {
-    UITableView* tableView = (id)self.view;
-    NSParameterAssert( !tableView || [tableView isKindOfClass:[UITableView class]] );
-    return tableView;
-}
-
-- (void)setTableView:(UITableView *)tableView {
-    UITableView *oldView = [self isViewLoaded] ? (id)self.view : nil;
-    if (oldView != tableView) {
-        self.view = tableView;
-        tableView.dataSource = self;
-        tableView.delegate = self;
-    }
-}
-
 - (void)setModel:(SWTableViewModel *)model {
     if (_model != model) {
+        UITableView* tv = self.tableView;
         if (_model && isSyncing(_syncStyle)) {
             [self unbindModel:_model];
         }
         _model = model;
-        [self.tableView reloadData];
+        [tv reloadData];
         if (_model && isSyncing(_syncStyle)) {
             [self bindModel:_model];
         }
@@ -105,7 +86,7 @@ static inline bool isSyncing(SWTableViewSyncStyle style) {
     if (model.updating) { [self endUpdates]; } // end sync updating stat
 }
 
-static inline bool shouldReloadTableView(SWTableViewController* self) {
+static inline bool shouldReloadTableView(SWTableViewBinder* self) {
     // NOTE: return value shouldn't change during batchUpdates
     return self->_syncStyle == SWTableViewSyncStyleReload;
 }
@@ -130,7 +111,6 @@ static inline bool shouldReloadTableView(SWTableViewController* self) {
     //       that's why use batch update. performance is also one factor.
     if (context == @"sections") {
         NSParameterAssert([NSThread isMainThread]);
-        NSParameterAssert(self.tableView);
         // deal section KVO change
         NSArray* oldSections = change[NSKeyValueChangeOldKey];
         NSArray* newSections = change[NSKeyValueChangeNewKey];
@@ -141,9 +121,10 @@ static inline bool shouldReloadTableView(SWTableViewController* self) {
             [element addObserver:self forKeyPath:@"rows" options:0 context:@"rows"];
         }
 
+        STRONGIFY_TABLEVIEW_OR_RETURN();
         if ( shouldReloadTableView(self) ) {
             if (!_model.updating) { // delay reloadData to endUpdating
-                [self.tableView reloadData];
+                [tableView reloadData];
             }
             return;
         }
@@ -163,20 +144,21 @@ static inline bool shouldReloadTableView(SWTableViewController* self) {
             PartialUpdateSection: {
                 NSIndexSet* indexes = change[NSKeyValueChangeIndexesKey];
                 void(*imp)(UITableView*, SEL, NSIndexSet*, UITableViewRowAnimation)
-                    = (void*)[self.tableView methodForSelector:updateSEL];
+                    = (void*)[tableView methodForSelector:updateSEL];
                 NSParameterAssert(imp); // clean analyze warning
-                imp(self.tableView, updateSEL, indexes, UITableViewRowAnimationAutomatic);
+                imp(tableView, updateSEL, indexes, UITableViewRowAnimationAutomatic);
             } return;
             case NSKeyValueChangeSetting: {
                 NSAssert( !_model.updating, @"shouldn't replace entire sections when batch updating!" );
-                [self.tableView reloadData];
+                [tableView reloadData];
             } return;
         } return;
     } else if (context == @"rows") {
         NSParameterAssert([NSThread isMainThread]);
+        STRONGIFY_TABLEVIEW_OR_RETURN();
         if ( shouldReloadTableView(self) ) {
             if (!_model.updating) { // delay reloadData to endUpdating
-                [self.tableView reloadData];
+                [tableView reloadData];
             }
             return;
         }
@@ -201,16 +183,17 @@ static inline bool shouldReloadTableView(SWTableViewController* self) {
                     [indexPaths addObject:[NSIndexPath indexPathForRow:idx inSection:section]];
                 }];
                 void (*imp)(UITableView*, SEL, NSArray*, UITableViewRowAnimation)
-                    = (void*)[self.tableView methodForSelector:updateSEL];
+                    = (void*)[tableView methodForSelector:updateSEL];
                 NSParameterAssert(imp);
-                imp(self.tableView, updateSEL, indexPaths, UITableViewRowAnimationAutomatic);
+                imp(tableView, updateSEL, indexPaths, UITableViewRowAnimationAutomatic);
             } return;
             case NSKeyValueChangeSetting: {
-                [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:section]
+                [tableView reloadSections:[NSIndexSet indexSetWithIndex:section]
                               withRowAnimation:UITableViewRowAnimationAutomatic];
             } return;
         } return;
     } else if (context == @"updating") {
+        STRONGIFY_TABLEVIEW_OR_RETURN();
         BOOL oldValue = [change[NSKeyValueChangeOldKey] boolValue];
         BOOL newValue = _model.updating;
         if (oldValue != newValue) {
@@ -312,11 +295,6 @@ static inline bool shouldReloadTableView(SWTableViewController* self) {
 }
 
 #pragma mark edit
-- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
-    [super setEditing:editing animated:animated];
-    [self.tableView setEditing:editing animated:animated];
-}
-
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         [_model deleteModelsAtIndexPaths:@[indexPath]];
@@ -370,4 +348,58 @@ static bool isTableViewDataSourceMethod(SEL selector, bool isRequired) {
 }
 
 */
+
+@end
+
+@implementation UITableView (SWTableViewBinder)
+
+static inline SWTableViewBinder* viewBinderOrDefault(UITableView* self){
+    SWTableViewBinder* binder = objc_getAssociatedObject(self, @selector(viewBinder));
+    if (!binder) {
+        binder = [[SWTableViewBinder alloc] initWithTableView:self];
+        objc_setAssociatedObject(self, @selector(viewBinder), binder, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    return binder;
+}
+
+- (SWTableViewBinder*)viewBinder {
+    return objc_getAssociatedObject(self, @selector(viewBinder));
+}
+
+- (void)setViewBinder:(SWTableViewBinder*)viewBinder {
+    objc_setAssociatedObject(self, @selector(viewBinder), viewBinder, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (SWTableViewModel *)bindModel {
+    return self.viewBinder.model;
+}
+
+- (void)setBindModel:(SWTableViewModel *)bindModel {
+    viewBinderOrDefault(self).model = bindModel;
+}
+
+- (SWTableViewSyncStyle)bindSyncStyle {
+    return self.viewBinder.syncStyle;
+}
+
+- (void)setBindSyncStyle:(SWTableViewSyncStyle)bindSyncStyle {
+    viewBinderOrDefault(self).syncStyle = bindSyncStyle;
+}
+
+- (id<SWCellFactory>)bindCellFactory {
+    return self.viewBinder.cellFactory;
+}
+
+- (void)setBindCellFactory:(id<SWCellFactory>)bindCellFactory {
+    viewBinderOrDefault(self).cellFactory = bindCellFactory;
+}
+
+- (id<SWCellDecorator>)bindCellDecorator {
+    return self.viewBinder.cellDecorator;
+}
+
+- (void)setBindCellDecorator:(id<SWCellDecorator>)bindCellDecorator {
+    viewBinderOrDefault(self).cellDecorator = bindCellDecorator;
+}
+
 @end
