@@ -74,13 +74,16 @@ static inline bool isSyncing(SWTableViewSyncStyle style) {
 }
 
 - (void)setSyncStyle:(SWTableViewSyncStyle)syncStyle {
-    bool changeSync = (isSyncing(_syncStyle) != isSyncing(syncStyle));
-    _syncStyle = syncStyle;
-    if (_model && changeSync) {
-        if (isSyncing(_syncStyle)) {
-            [self bindModel:_model];
-        } else {
-            [self unbindModel:_model];
+    if (syncStyle != _syncStyle) {
+        bool const changeSync = (isSyncing(_syncStyle) != isSyncing(syncStyle));
+        if (_model && isSyncing(_syncStyle)) {
+            if (changeSync) { [self unbindModel:_model]; }
+            else if (_model.updating) { [self endUpdates]; }
+        }
+        _syncStyle = syncStyle;
+        if (_model && isSyncing(_syncStyle)) {
+            if (changeSync) { [self bindModel:_model]; }
+            else if (_model.updating) { [self beginUpdates]; }
         }
     }
 }
@@ -160,6 +163,7 @@ static inline bool shouldReloadTableView(SWTableViewController* self) {
                 goto PartialUpdateSection;
             case NSKeyValueChangeInsertion:
                 updateSEL = @selector(insertSections:withRowAnimation:);
+                goto PartialUpdateSection;
             PartialUpdateSection: {
                 NSIndexSet* indexes = change[NSKeyValueChangeIndexesKey];
                 void(*imp)(UITableView*, SEL, NSIndexSet*, UITableViewRowAnimation)
@@ -194,6 +198,7 @@ static inline bool shouldReloadTableView(SWTableViewController* self) {
                 goto PartialUpdate;
             case NSKeyValueChangeInsertion:
                 updateSEL = @selector(insertRowsAtIndexPaths:withRowAnimation:);
+                goto PartialUpdate;
             PartialUpdate: {
                 NSIndexSet* indexes = change[NSKeyValueChangeIndexesKey];
                 NSMutableArray* indexPaths = [NSMutableArray new];
