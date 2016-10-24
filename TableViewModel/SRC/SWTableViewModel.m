@@ -60,6 +60,7 @@
         self.updating = NO;
     }
 }
+
 - (id)modelAtIndexPath:(NSIndexPath *)indexPath {
     return [[self objectInSectionsAtIndex:indexPath.section] objectInRowsAtIndex:indexPath.row];
 }

@@ -89,22 +89,22 @@ static inline bool isSyncing(SWTableViewSyncStyle style) {
 }
 
 - (void)bindModel:(SWTableViewModel*)model {
-    [model addObserver:self forKeyPath:@"updating" options:NSKeyValueObservingOptionOld context:@"updating"];
+    [model addObserver:self forKeyPath:@"updating" options:NSKeyValueObservingOptionOld context:@"model_updating"];
     if (model.updating) { [self beginUpdates]; } // sync updating stat
 
-    [model addObserver:self forKeyPath:@"sections" options:NSKeyValueObservingOptionOld|NSKeyValueObservingOptionNew context:@"sections"];
+    [model addObserver:self forKeyPath:@"sections" options:NSKeyValueObservingOptionOld|NSKeyValueObservingOptionNew context:@"model_sections"];
     for (SWTableSectionViewModel* element in model.sections){
-        [element addObserver:self forKeyPath:@"rows" options:0 context:@"rows"];
+        [element addObserver:self forKeyPath:@"rows" options:0 context:@"model_rows"];
     }
 }
 
 - (void)unbindModel:(SWTableViewModel*)model {
     for (SWTableSectionViewModel* element in model.sections){
-        [element removeObserver:self forKeyPath:@"rows" context:@"rows"];
+        [element removeObserver:self forKeyPath:@"rows" context:@"model_rows"];
     }
-    [model removeObserver:self forKeyPath:@"sections" context:@"sections"];
+    [model removeObserver:self forKeyPath:@"sections" context:@"model_sections"];
 
-    [model removeObserver:self forKeyPath:@"updating" context:@"updating"];
+    [model removeObserver:self forKeyPath:@"updating" context:@"model_updating"];
     if (model.updating) { [self endUpdates]; } // end sync updating stat
 }
 
@@ -131,17 +131,17 @@ static inline bool shouldReloadTableView(SWTableViewController* self) {
     // BUGS: float section footer may move to bottom when partially update tableView
     // NOTE: when not batch update, delete rows may cause contentSize and offset change.
     //       that's why use batch update. performance is also one factor.
-    if (context == @"sections") {
+    if (context == @"model_sections") {
         NSParameterAssert([NSThread isMainThread]);
         NSParameterAssert(self.tableView);
         // deal section KVO change
         NSArray* oldSections = change[NSKeyValueChangeOldKey];
         NSArray* newSections = change[NSKeyValueChangeNewKey];
         for (SWTableSectionViewModel* element in oldSections){
-            [element removeObserver:self forKeyPath:@"rows" context:@"rows"];
+            [element removeObserver:self forKeyPath:@"rows" context:@"model_rows"];
         }
         for (SWTableSectionViewModel* element in newSections){
-            [element addObserver:self forKeyPath:@"rows" options:0 context:@"rows"];
+            [element addObserver:self forKeyPath:@"rows" options:0 context:@"model_rows"];
         }
 
         if ( shouldReloadTableView(self) ) {
@@ -176,7 +176,7 @@ static inline bool shouldReloadTableView(SWTableViewController* self) {
                 [self.tableView reloadData];
             } return;
         } return;
-    } else if (context == @"rows") {
+    } else if (context == @"model_rows") {
         NSParameterAssert([NSThread isMainThread]);
         if ( shouldReloadTableView(self) ) {
             if (!_model.updating) { // delay reloadData to endUpdating
@@ -215,7 +215,7 @@ static inline bool shouldReloadTableView(SWTableViewController* self) {
                               withRowAnimation:UITableViewRowAnimationAutomatic];
             } return;
         } return;
-    } else if (context == @"updating") {
+    } else if (context == @"model_updating") {
         BOOL oldValue = [change[NSKeyValueChangeOldKey] boolValue];
         BOOL newValue = _model.updating;
         if (oldValue != newValue) {
