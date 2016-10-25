@@ -42,4 +42,6 @@
 #pragma mark - subclass to override
 /** default cellFactory to use when not set cellFactory */
 - (id<SWCellFactory>)defaultCellFactory;
+- (UITableViewRowAnimation)animationForUpdateSEL:(SEL)sel;
+
 @end

@@ -169,7 +169,7 @@ static inline bool shouldReloadTableView(SWTableViewController* self) {
                 void(*imp)(UITableView*, SEL, NSIndexSet*, UITableViewRowAnimation)
                     = (void*)[self.tableView methodForSelector:updateSEL];
                 NSParameterAssert(imp); // clean analyze warning
-                imp(self.tableView, updateSEL, indexes, UITableViewRowAnimationAutomatic);
+                imp(self.tableView, updateSEL, indexes, [self animationForUpdateSEL:updateSEL]);
             } return;
             case NSKeyValueChangeSetting: {
                 NSAssert( !_model.updating, @"shouldn't replace entire sections when batch updating!" );
@@ -208,11 +208,11 @@ static inline bool shouldReloadTableView(SWTableViewController* self) {
                 void (*imp)(UITableView*, SEL, NSArray*, UITableViewRowAnimation)
                     = (void*)[self.tableView methodForSelector:updateSEL];
                 NSParameterAssert(imp);
-                imp(self.tableView, updateSEL, indexPaths, UITableViewRowAnimationAutomatic);
+                imp(self.tableView, updateSEL, indexPaths, [self animationForUpdateSEL:updateSEL]);
             } return;
             case NSKeyValueChangeSetting: {
                 [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:section]
-                              withRowAnimation:UITableViewRowAnimationAutomatic];
+                              withRowAnimation:[self animationForUpdateSEL:@selector(reloadSections:withRowAnimation:)]];
             } return;
         } return;
     } else if (context == @"model_updating") {
@@ -247,6 +247,9 @@ static inline bool shouldReloadTableView(SWTableViewController* self) {
     return [_model modelAtIndexPath:indexPath];
 }
 
+- (UITableViewRowAnimation)animationForUpdateSEL:(SEL)sel {
+    return UITableViewRowAnimationAutomatic;
+}
 #pragma mark - TableView Delegate
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return [[_model objectInSectionsAtIndex:section] countOfRows];
